@@ -36,6 +36,7 @@ import { useBIExpressContext } from "@/contexts/BIExpressContext";
 import { TEMPLATE_CATALOG } from "@/lib/bi-express-engine";
 import { useLogisticsContext } from "@/contexts/LogisticsContext";
 import { useForecastContext } from "@/contexts/ForecastContext";
+import { useBSCContext } from "@/contexts/BSCContext";
 import { useTenant } from "@/hooks/use-tenant";
 import {
   Sidebar,
@@ -52,6 +53,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useTheme } from "@/hooks/use-theme";
 import { Button } from "@/components/ui/button";
+import { getCurrencySymbol } from "@/hooks/use-currency";
 
 const mainNav = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
@@ -62,10 +64,6 @@ const adminNav = [
   { title: "Administración", url: "/admin", icon: Users },
 ];
 
-const bscNav = [
-  { title: "Estrategia", url: "/strategy", icon: Target },
-  { title: "Analítica", url: "/analytics", icon: BarChart3 },
-];
 
 function NavSection({
   label,
@@ -116,13 +114,16 @@ export function AppSidebar() {
     useLogisticsContext();
   const { selectedForecastModel, selectedForecastPeriod, setSelectedForecastModel, setSelectedForecastPeriod } =
     useForecastContext();
+  const { selectedBSCModel, selectedBSCPeriod, setSelectedBSCModel, setSelectedBSCPeriod } =
+    useBSCContext();
   const navigate = useNavigate();
 
   const isInABC = !!(selectedModel && selectedPeriod);
   const isInBI = !!(selectedBIModel && selectedBIPeriod);
   const isInLogistics = !!(selectedLogisticsModel && selectedLogisticsPeriod);
   const isInForecast = !!(selectedForecastModel && selectedForecastPeriod);
-  const isInModule = isInABC || isInBI || isInLogistics || isInForecast;
+  const isInBSC = !!(selectedBSCModel && selectedBSCPeriod);
+  const isInModule = isInABC || isInBI || isInLogistics || isInForecast || isInBSC;
 
   const handleSignOut = async () => {
     await signOut();
@@ -151,6 +152,12 @@ export function AppSidebar() {
     setSelectedForecastModel(null);
     setSelectedForecastPeriod(null);
     navigate("/forecast");
+  };
+
+  const handleBackToBSCModels = () => {
+    setSelectedBSCModel(null);
+    setSelectedBSCPeriod(null);
+    navigate("/bsc");
   };
 
   const toolsNav = isInABC
@@ -182,11 +189,17 @@ export function AppSidebar() {
         { title: "Datos de Entrada", url: "/forecast/data", icon: Database },
         { title: "Resultados", url: "/forecast/results", icon: LineChart },
       ]
+    : isInBSC
+    ? [
+        { title: "Estrategia", url: "/bsc/strategy", icon: Target },
+        { title: "Analítica", url: "/bsc/analytics", icon: BarChart3 },
+      ]
     : [
         { title: "Costeo ABC", url: "/models", icon: Database },
         { title: "BI Express", url: "/bi-express", icon: TrendingUp },
         { title: "Eficiencia logística", url: "/logistics", icon: Truck },
         { title: "Forecast", url: "/forecast", icon: LineChart },
+        { title: "Estrategia BSC", url: "/bsc", icon: Target },
       ];
 
   const reportsNav = [
@@ -195,14 +208,14 @@ export function AppSidebar() {
     { title: "Sensibilidad", url: "/sensitivity", icon: FlaskConical },
     { title: "Resumen ejecutivo", url: "/executive-summary", icon: FileSpreadsheet },
     { title: "Análisis Cruzado", url: "/cross-analysis", icon: TableProperties },
-    { title: "Validación del modelo", url: "/model-health", icon: ShieldCheck },
     { title: "Comparativo períodos", url: "/period-comparison", icon: CalendarRange },
+    { title: "Validación del modelo", url: "/model-health", icon: ShieldCheck },
   ];
 
   // Determine which active model to show in header
-  const activeModel = isInABC ? selectedModel : isInBI ? selectedBIModel : isInLogistics ? selectedLogisticsModel : isInForecast ? selectedForecastModel : null;
-  const activePeriod = isInABC ? selectedPeriod : isInBI ? selectedBIPeriod : isInLogistics ? selectedLogisticsPeriod : isInForecast ? selectedForecastPeriod : null;
-  const handleBack = isInABC ? handleBackToModels : isInBI ? handleBackToBIModels : isInLogistics ? handleBackToLogisticsModels : handleBackToForecastModels;
+  const activeModel = isInABC ? selectedModel : isInBI ? selectedBIModel : isInLogistics ? selectedLogisticsModel : isInForecast ? selectedForecastModel : isInBSC ? selectedBSCModel : null;
+  const activePeriod = isInABC ? selectedPeriod : isInBI ? selectedBIPeriod : isInLogistics ? selectedLogisticsPeriod : isInForecast ? selectedForecastPeriod : isInBSC ? selectedBSCPeriod : null;
+  const handleBack = isInABC ? handleBackToModels : isInBI ? handleBackToBIModels : isInLogistics ? handleBackToLogisticsModels : isInForecast ? handleBackToForecastModels : handleBackToBSCModels;
 
   return (
     <Sidebar collapsible="icon">
@@ -240,12 +253,17 @@ export function AppSidebar() {
               <ArrowLeft className="h-4 w-4" />
             </button>
             <div className="flex flex-col gap-0.5 overflow-hidden">
-              <span className="text-xs font-semibold text-primary line-clamp-1">
+              <span className="text-base font-semibold text-primary line-clamp-1">
                 {activeModel.name}
               </span>
-              <span className="text-[10px] text-muted-foreground line-clamp-1">
+              <span className="text-xs text-muted-foreground line-clamp-1">
                 Período: {activePeriod.name}
               </span>
+              {isInABC && activeModel.base_currency && (
+                <span className="text-xs text-muted-foreground">
+                  Moneda: {activeModel.base_currency} {getCurrencySymbol(activeModel.base_currency)}
+                </span>
+              )}
             </div>
           </div>
         )}
@@ -256,15 +274,19 @@ export function AppSidebar() {
           <NavSection label="General" items={userRole === "admin" ? adminNav : mainNav} collapsed={collapsed} />
         )}
         <NavSection
-          label={isInABC ? "Costeo ABC" : isInBI ? "BI Express" : isInLogistics ? "Eficiencia Logística" : isInForecast ? "Forecast" : "Herramientas de análisis"}
+          label={
+            isInABC ? "Costeo ABC"
+            : isInBI ? "BI Express"
+            : isInLogistics ? "Eficiencia Logística"
+            : isInForecast ? "Forecast"
+            : isInBSC ? "Estrategia BSC"
+            : "Herramientas de análisis"
+          }
           items={toolsNav}
           collapsed={collapsed}
         />
         {isInABC && (
           <NavSection label="Reportes" items={reportsNav} collapsed={collapsed} />
-        )}
-        {!isInModule && (
-          <NavSection label="BSC" items={bscNav} collapsed={collapsed} />
         )}
       </SidebarContent>
 

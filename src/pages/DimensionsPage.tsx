@@ -102,7 +102,7 @@ function TreeRow({
         style={{ paddingLeft: `${8 + depth * 20}px` }}
       >
         <button
-          className="shrink-0 text-muted-foreground"
+          className="shrink-0 h-4 w-4 flex items-center justify-center text-muted-foreground"
           onClick={() => setOpen((v) => !v)}
         >
           {hasChildren ? (
@@ -115,18 +115,22 @@ function TreeRow({
             <span className="h-4 w-4 block" />
           )}
         </button>
-        <span className="text-xs text-muted-foreground font-mono whitespace-nowrap shrink-0 w-24">
-          {node.code}
-        </span>
-        <span className="flex-1 text-sm">{node.name}</span>
-        <span className="w-28 text-right text-xs font-mono text-muted-foreground shrink-0">
+        <div className="flex flex-col flex-1 min-w-0">
+          <span className="font-mono text-sm text-muted-foreground leading-tight">
+            {node.code}
+          </span>
+          <span className="text-sm truncate" title={node.name}>
+            {node.name}
+          </span>
+        </div>
+        <span className="w-28 text-right text-sm font-mono text-muted-foreground shrink-0">
           {venta > 0 ? fmt(venta) : "—"}
         </span>
-        <span className="w-28 text-right text-xs font-mono text-muted-foreground shrink-0">
+        <span className="w-28 text-right text-sm font-mono text-muted-foreground shrink-0">
           {assignedCost > 0 ? fmt(assignedCost) : "—"}
         </span>
         <span
-          className={`w-20 text-right text-xs font-mono font-medium shrink-0 ${
+          className={`w-20 text-right text-sm font-mono font-medium shrink-0 ${
             eficiencia === null
               ? "text-muted-foreground"
               : eficiencia >= 0
@@ -505,9 +509,9 @@ export default function DimensionsPage() {
         description="Definí las dimensiones de análisis del modelo (productos, canales, regiones, etc.) y asigná los objetos de costo."
       />
 
-      <div className="flex gap-4 h-[calc(100vh-11rem)] p-4">
+      <div className="flex flex-col gap-4 md:flex-row md:h-[calc(100vh-11rem)]">
         {/* ── Left: Dimensions list ───────────────────────── */}
-        <div className="w-72 shrink-0 flex flex-col gap-3">
+        <div className="w-full md:w-72 md:shrink-0 flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
               Dimensiones
@@ -544,10 +548,10 @@ export default function DimensionsPage() {
                     >
                       <Layers className="h-4 w-4 shrink-0 opacity-60" />
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{dim.name}</p>
                         {dim.code && (
-                          <p className="text-xs text-muted-foreground font-mono">{dim.code}</p>
+                          <p className="text-sm text-muted-foreground font-mono leading-tight">{dim.code}</p>
                         )}
+                        <p className="text-sm font-medium truncate">{dim.name}</p>
                       </div>
                       <Badge variant="outline" className="text-xs shrink-0">
                         {dimItemCount(dim.id)}
@@ -615,10 +619,9 @@ export default function DimensionsPage() {
                   ) : (
                     <div className="p-2">
                       {/* Column headers */}
-                      <div className="flex items-center gap-2 pb-1 mb-1 border-b border-border/50" style={{ paddingLeft: "8px" }}>
+                      <div className="flex items-center gap-2 pb-1 mb-1 border-b border-border/50 pr-2" style={{ paddingLeft: "8px" }}>
                         <span className="h-4 w-4 shrink-0" />
-                        <span className="w-24 shrink-0" />
-                        <span className="flex-1" />
+                        <span className="flex-1 text-xs font-medium text-muted-foreground">Ítem</span>
                         <span className="w-28 text-right text-xs font-medium text-muted-foreground shrink-0">Venta</span>
                         <span className="w-28 text-right text-xs font-medium text-muted-foreground shrink-0">Costo</span>
                         <span className="w-20 text-right text-xs font-medium text-muted-foreground shrink-0">Eficiencia</span>
@@ -643,6 +646,40 @@ export default function DimensionsPage() {
                           getAssignedCost={assignedCostForItem}
                         />
                       ))}
+                      {(() => {
+                        const fmtN = (n: number) => n.toLocaleString("es-BO", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        const totalVenta = dimensionItems.reduce((s, i) => s + (i.price ?? 0), 0);
+                        const totalCosto = dimensionItems.reduce((s, i) => s + assignedCostForItem(i.id), 0);
+                        const totalEficiencia = totalVenta > 0 ? ((totalVenta - totalCosto) / totalVenta) * 100 : null;
+                        return (
+                          <div className="flex items-center gap-2 py-1.5 px-2 mt-1 border-t border-border/50 font-semibold" style={{ paddingLeft: "8px" }}>
+                            <span className="h-4 w-4 shrink-0" />
+                            <span className="flex-1 text-sm text-muted-foreground font-mono">TOTAL</span>
+                            <span className="w-28 text-right text-sm font-mono shrink-0">
+                              {totalVenta > 0 ? fmtN(totalVenta) : "—"}
+                            </span>
+                            <span className="w-28 text-right text-sm font-mono shrink-0">
+                              {totalCosto > 0 ? fmtN(totalCosto) : "—"}
+                            </span>
+                            <span className={`w-20 text-right text-sm font-mono shrink-0 ${
+                              totalEficiencia === null
+                                ? "text-muted-foreground"
+                                : totalEficiencia >= 0
+                                  ? "text-green-500"
+                                  : "text-destructive"
+                            }`}>
+                              {totalEficiencia !== null ? `${totalEficiencia.toFixed(1)}%` : "—"}
+                            </span>
+                            <Badge variant="secondary" className="text-xs shrink-0 ml-4 invisible">0 obj.</Badge>
+                            <div className="flex items-center gap-1">
+                              <span className="h-6 w-6 shrink-0" />
+                              <span className="h-6 w-6 shrink-0" />
+                              <span className="h-6 w-6 shrink-0" />
+                              <span className="h-6 w-6 shrink-0" />
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </div>
                   )}
                 </ScrollArea>

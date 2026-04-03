@@ -153,8 +153,8 @@ export default function LogisticsModelsPage() {
 
   return (
     <AppLayout>
-      <div className="flex flex-col gap-6 p-6">
-        <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
           <PageHeader
             title="Eficiencia Logística"
             description="Calcula el Punto de Equilibrio y Drop Size Mínimo por ruta para optimizar la rentabilidad logística"

@@ -195,7 +195,7 @@ export default function ForecastPage() {
   if (isDataView) {
     return (
       <AppLayout>
-        <div className="flex flex-col gap-6 p-6">
+        <div className="flex flex-col gap-6">
           <PageHeader
             title="Datos de Entrada"
             description="Serie de tiempo histórica para el modelo de forecast"
@@ -359,13 +359,13 @@ export default function ForecastPage() {
   // ══════════════════════════════════════════════════════════════════════════
   return (
     <AppLayout>
-      <div className="flex flex-col gap-6 p-6">
-        <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
           <PageHeader
             title="Resultados del Forecast"
             description="Proyección predictiva basada en datos históricos"
           />
-          <Button variant="outline" size="sm" onClick={handleExportCSV}>
+          <Button variant="outline" size="sm" onClick={handleExportCSV} className="shrink-0">
             <Download className="h-4 w-4 mr-2" />
             Exportar CSV
           </Button>

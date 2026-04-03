@@ -178,11 +178,11 @@ function renderDimTable(
                       className="font-medium"
                       style={{ paddingLeft: `${8 + row.item.level * 16}px` }}
                     >
-                      <div className="flex flex-col">
-                        <span className="text-xs text-muted-foreground font-mono leading-none mb-0.5">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-mono text-sm text-muted-foreground leading-tight">
                           {row.item.code}
                         </span>
-                        <span>{row.item.name}</span>
+                        <span className="text-sm">{row.item.name}</span>
                       </div>
                     </TableCell>
                     <TableCell className="text-right font-mono text-sm">
@@ -424,7 +424,7 @@ export default function CrossAnalysisPage() {
         description="Analizá la rentabilidad y distribución de costos por dimensiones configuradas en el modelo."
       />
 
-      <div className="p-4 flex flex-col gap-6">
+      <div className="flex flex-col gap-6">
         {/* ── Selectors ───────────────────────────────────── */}
         <Card>
           <CardContent className="pt-4">

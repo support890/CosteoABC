@@ -6,6 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   Table,
   TableBody,
@@ -29,6 +40,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   ArrowRight,
   Plus,
@@ -701,6 +713,8 @@ function DriverCard({
   driver,
   sourceName,
   sourceAmount,
+  sourceType,
+  sourceCategory,
   destItems,
   onDelete,
   onEdit,
@@ -716,6 +730,8 @@ function DriverCard({
   };
   sourceName: string;
   sourceAmount: number;
+  sourceType: string | null;
+  sourceCategory: string | null;
   destItems: { id: string; code: string; name: string }[];
   onDelete: (id: string) => void;
   onEdit: (driver: any) => void;
@@ -733,12 +749,12 @@ function DriverCard({
       <CardContent className="p-4">
         {/* Header row */}
         <div className="flex items-center gap-4 flex-wrap">
-          <div className={`rounded-lg px-4 py-3 w-[260px] shrink-0 ${
+          <div className={`rounded-lg px-4 py-3 w-[380px] shrink-0 ${
             driver.source_type === "activity" || driver.source_type === "activity_center"
               ? "bg-warning/10 border border-warning/20"
               : "bg-primary/10 border border-primary/20"
           }`}>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground mb-1">
               Origen (
               {driver.source_type === "resource"
                 ? "Recurso"
@@ -749,14 +765,26 @@ function DriverCard({
                     : "Centro de Actividades"}
               )
             </p>
-            <div className="mt-1 flex flex-wrap gap-1">
-              <span className={`text-[10px] font-mono rounded px-1.5 py-0.5 text-foreground ${
+            <div className="flex flex-col gap-1.5">
+              <span className={`text-[10px] font-mono rounded px-1.5 py-0.5 text-foreground self-start ${
                 driver.source_type === "activity" || driver.source_type === "activity_center"
                   ? "bg-warning/30"
                   : "bg-primary/30"
               }`}>
                 {sourceName}
               </span>
+              <div className="flex gap-1 flex-wrap">
+                {sourceType && (
+                  <Badge variant="secondary" className="bg-violet-500/10 text-violet-400 capitalize text-[10px] px-1.5 py-0">
+                    {sourceType}
+                  </Badge>
+                )}
+                {sourceCategory && (
+                  <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-400 text-[10px] px-1.5 py-0">
+                    {sourceCategory}
+                  </Badge>
+                )}
+              </div>
             </div>
           </div>
 
@@ -796,29 +824,35 @@ function DriverCard({
                       driver.destination_type === "cost_object" ||
                       driver.destination_type === "cost_object_center";
                     return dest ? (
-                      <span
-                        key={line.id}
-                        className={`text-[10px] font-mono rounded px-1.5 py-0.5 text-foreground ${
-                          isCostObject ? "bg-blue-500/30" : "bg-warning/30"
-                        }`}
-                      >
-                        {dest.code}
-                      </span>
+                      <Popover key={line.id}>
+                        <PopoverTrigger asChild>
+                          <span
+                            title={dest.name}
+                            className={`text-[10px] font-mono rounded px-1.5 py-0.5 text-foreground cursor-pointer ${
+                              isCostObject ? "bg-blue-500/30 hover:bg-blue-500/50" : "bg-warning/30 hover:bg-warning/50"
+                            }`}
+                          >
+                            {dest.code}
+                          </span>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto px-3 py-2 text-xs" side="top">
+                          {dest.name}
+                        </PopoverContent>
+                      </Popover>
                     ) : null;
                   })}
                 </div>
               </div>
-              <Badge variant="secondary" className={`${info.color} shrink-0`}>
-                {info.label}
-              </Badge>
-            </div>
-            <div className="flex items-center gap-2 mt-1 flex-wrap">
-              {hasTotalValue && <span className="text-[10px] text-muted-foreground">{modeLabel}</span>}
               {hasTotalValue && (
-                <span className="text-xs font-mono">
+                <span className="text-xs font-mono shrink-0">
                   (Total: {driver.total_value!.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
                 </span>
               )}
+            </div>
+            <div className="flex items-center gap-2 mt-1 flex-wrap">
+              <Badge variant="secondary" className={`${info.color} shrink-0 text-[10px] px-1.5 py-0`}>
+                {info.label}
+              </Badge>
             </div>
           </div>
 
@@ -891,13 +925,13 @@ function DriverCard({
                             ? `${dest.code} — ${dest.name}`
                             : line.destination_id}
                         </TableCell>
-                        <TableCell className="text-right font-mono text-xs">
+                        <TableCell className="text-right font-mono text-sm">
                           {line.value.toLocaleString()}
                         </TableCell>
-                        <TableCell className="text-right font-mono text-xs">
+                        <TableCell className="text-right font-mono text-sm">
                           {line.percentage.toFixed(2)}%
                         </TableCell>
-                        <TableCell className="text-right font-mono text-xs font-medium">
+                        <TableCell className="text-right font-mono text-sm font-medium">
                           {fmt(allocatedAmount)}
                         </TableCell>
                       </TableRow>
@@ -941,6 +975,7 @@ const AssignmentsPage = () => {
   const driverLinesHook = useDriverLines();
   const allocation = useAllocation();
   const [editingDriver, setEditingDriver] = useState<any | null>(null);
+  const [driverToDelete, setDriverToDelete] = useState<string | null>(null);
 
   const enrichedCostCenters = useMemo(() => {
     return costCentersHook.items.map((center) => {
@@ -1037,6 +1072,8 @@ const AssignmentsPage = () => {
     return {
       name: item ? `${item.code} — ${item.name}` : "—",
       amount: baseAmount + received,
+      type: (item as any)?.type ?? null,
+      category: (item as any)?.category ?? null,
     };
   };
 
@@ -1106,9 +1143,14 @@ const AssignmentsPage = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
+    setDriverToDelete(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!driverToDelete) return;
     try {
-      await drivers.remove.mutateAsync(id);
+      await drivers.remove.mutateAsync(driverToDelete);
       await queryClient.invalidateQueries({ queryKey: ["all_driver_lines"] });
       toast({ title: "Asignación eliminada" });
     } catch (err: unknown) {
@@ -1117,6 +1159,8 @@ const AssignmentsPage = () => {
         title: "Error",
         description: (err as Error).message,
       });
+    } finally {
+      setDriverToDelete(null);
     }
   };
 
@@ -1192,64 +1236,86 @@ const AssignmentsPage = () => {
           </p>
         </div>
       ) : (
-        <div className="space-y-6">
-          {/* Stage 1: Resources → Activities */}
-          {resourceToActivity.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
-                <Badge variant="outline" className="bg-primary/5">
-                  Etapa 1
-                </Badge>
-                Recursos → Actividades / Recursos ({resourceToActivity.length})
-              </h3>
-              <div className="grid grid-cols-1 gap-3">
-                {resourceToActivity.map((driver) => {
-                  const source = getSourceInfo(driver);
-                  return (
-                    <DriverCard
-                      key={driver.id}
-                      driver={driver}
-                      sourceName={source.name}
-                      sourceAmount={source.amount}
-                      destItems={getDestItems(driver)}
-                      onDelete={handleDelete}
-                      onEdit={setEditingDriver}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-          )}
+        <Tabs defaultValue="stage1">
+          <TabsList className="mb-4 w-full grid grid-cols-2 h-auto">
+            <TabsTrigger value="stage1" className="gap-1.5 text-xs py-2 flex-wrap justify-center">
+              <Badge variant="outline" className="bg-primary/5 text-[10px] px-1.5 py-0">Etapa 1</Badge>
+              <span>Recursos → Actividades ({resourceToActivity.length})</span>
+            </TabsTrigger>
+            <TabsTrigger value="stage2" className="gap-1.5 text-xs py-2 flex-wrap justify-center">
+              <Badge variant="outline" className="bg-warning/5 text-[10px] px-1.5 py-0">Etapa 2</Badge>
+              <span>Actividades → Obj. Costo ({activityToObject.length})</span>
+            </TabsTrigger>
+          </TabsList>
 
-          {/* Stage 2: Activities/Resources → Cost Objects */}
-          {activityToObject.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
-                <Badge variant="outline" className="bg-warning/5">
-                  Etapa 2
-                </Badge>
-                Actividades → Objetos de Costo ({activityToObject.length})
-              </h3>
-              <div className="grid grid-cols-1 gap-3">
-                {activityToObject.map((driver) => {
-                  const source = getSourceInfo(driver);
-                  return (
-                    <DriverCard
-                      key={driver.id}
-                      driver={driver}
-                      sourceName={source.name}
-                      sourceAmount={source.amount}
-                      destItems={getDestItems(driver)}
-                      onDelete={handleDelete}
-                      onEdit={setEditingDriver}
-                    />
-                  );
-                })}
-              </div>
+          <TabsContent value="stage1">
+            <div className="grid grid-cols-1 gap-3">
+              {resourceToActivity.map((driver) => {
+                const source = getSourceInfo(driver);
+                return (
+                  <DriverCard
+                    key={driver.id}
+                    driver={driver}
+                    sourceName={source.name}
+                    sourceAmount={source.amount}
+                    sourceType={source.type}
+                    sourceCategory={source.category}
+                    destItems={getDestItems(driver)}
+                    onDelete={handleDelete}
+                    onEdit={setEditingDriver}
+                  />
+                );
+              })}
+              {resourceToActivity.length === 0 && (
+                <p className="text-sm text-muted-foreground text-center py-10">No hay asignaciones en esta etapa.</p>
+              )}
             </div>
-          )}
-        </div>
+          </TabsContent>
+
+          <TabsContent value="stage2">
+            <div className="grid grid-cols-1 gap-3">
+              {activityToObject.map((driver) => {
+                const source = getSourceInfo(driver);
+                return (
+                  <DriverCard
+                    key={driver.id}
+                    driver={driver}
+                    sourceName={source.name}
+                    sourceAmount={source.amount}
+                    sourceType={source.type}
+                    sourceCategory={source.category}
+                    destItems={getDestItems(driver)}
+                    onDelete={handleDelete}
+                    onEdit={setEditingDriver}
+                  />
+                );
+              })}
+              {activityToObject.length === 0 && (
+                <p className="text-sm text-muted-foreground text-center py-10">No hay asignaciones en esta etapa.</p>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
       )}
+      <AlertDialog open={!!driverToDelete} onOpenChange={(open) => { if (!open) setDriverToDelete(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar driver?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción eliminará el driver y puede desasignar los costos que ya fueron distribuidos a los objetos de costo vinculados. Esta operación no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={confirmDelete}
+            >
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppLayout>
   );
 };

@@ -151,8 +151,8 @@ export default function BIExpressModelsPage() {
 
   return (
     <AppLayout>
-      <div className="flex flex-col gap-6 p-6">
-        <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
           <PageHeader
             title="BI Express"
             description="Crea modelos de análisis y carga datos transaccionales para generar KPIs automáticos"

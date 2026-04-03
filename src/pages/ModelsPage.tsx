@@ -154,8 +154,8 @@ export default function ModelsPage() {
 
   return (
     <AppLayout>
-      <div className="flex flex-col gap-6 p-6">
-        <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
           <PageHeader
             title="Modelos de Costeo ABC"
             description="Administra los modelos de costeo y sus períodos asociados"

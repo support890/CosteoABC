@@ -10,7 +10,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <header className="h-12 flex items-center border-b px-4 bg-card/50 backdrop-blur-sm sticky top-0 z-10">
             <SidebarTrigger className="mr-4" />
           </header>
-          <main className="flex-1 p-6 animate-fade-in">{children}</main>
+          <main className="flex-1 p-3 sm:p-6 animate-fade-in">{children}</main>
         </div>
       </div>
     </SidebarProvider>

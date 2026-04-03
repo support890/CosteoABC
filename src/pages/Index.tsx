@@ -1,127 +1,158 @@
+import React from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { PageHeader } from "@/components/PageHeader";
-import { GaugeChart } from "@/components/charts/GaugeChart";
-import { StrategicMapCard } from "@/components/charts/StrategicMapCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-import {
+  Calculator,
+  BarChart2,
+  Truck,
   TrendingUp,
-  DollarSign,
-  Activity,
   Target,
   Loader2,
+  Calendar,
+  Box,
+  Building2,
 } from "lucide-react";
-import {
-  useResources,
-  useActivities,
-  useKPIs,
-  usePerspectives,
-} from "@/hooks/use-supabase-data";
+import { useModels, usePeriods } from "@/hooks/use-supabase-data";
+import { useBIModels } from "@/hooks/use-bi-express-data";
+import { useLogisticsModels } from "@/hooks/use-logistics-data";
+import { useForecastModels } from "@/hooks/use-forecast-data";
+import { useBSCModels } from "@/hooks/use-bsc-data";
 import { useTenant } from "@/hooks/use-tenant";
 
-/* ───── fallback chart data ───── */
-const histogramData = [
-  { month: "Ene", actual: 12400, target: 13000 },
-  { month: "Feb", actual: 11800, target: 13000 },
-  { month: "Mar", actual: 14200, target: 13500 },
-  { month: "Abr", actual: 13800, target: 13500 },
-  { month: "May", actual: 15200, target: 14000 },
-  { month: "Jun", actual: 14600, target: 14000 },
-];
-
-function getKPIStatus(kpi: {
-  current_value: number;
-  threshold_green: number | null;
-  threshold_yellow: number | null;
-}): "success" | "warning" | "danger" {
-  if (kpi.threshold_green != null && kpi.current_value >= kpi.threshold_green)
-    return "success";
-  if (kpi.threshold_yellow != null && kpi.current_value >= kpi.threshold_yellow)
-    return "warning";
-  return "danger";
+/* ── Small stat pill inside a tool card ── */
+function Stat({ value, label }: { value: number; label: string }) {
+  return (
+    <div className="text-center">
+      <p className="text-2xl font-bold leading-tight">{value}</p>
+      <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
+    </div>
+  );
 }
 
+/* ── Model list row: name + period badge ── */
+function ModelRow({ name, periodCount }: { name: string; periodCount: number }) {
+  return (
+    <div className="flex items-center justify-between py-1.5 border-b border-border/40 last:border-0">
+      <span className="text-sm truncate max-w-[70%]">{name}</span>
+      <Badge variant="secondary" className="text-xs shrink-0 gap-1">
+        <Calendar className="h-3 w-3" />
+        {periodCount} {periodCount === 1 ? "período" : "períodos"}
+      </Badge>
+    </div>
+  );
+}
+
+/* ── Tool card ── */
+interface ToolCardProps {
+  icon: React.ElementType;
+  iconColor: string;
+  iconBg: string;
+  name: string;
+  description: string;
+  models: { id: string; name: string }[];
+  periodsByModel: Record<string, number>;
+}
+
+function ToolCard({
+  icon: Icon,
+  iconColor,
+  iconBg,
+  name,
+  description,
+  models,
+  periodsByModel,
+}: ToolCardProps) {
+  const totalModels = models.length;
+  const totalPeriods = models.reduce(
+    (sum, m) => sum + (periodsByModel[m.id] ?? 0),
+    0,
+  );
+
+  return (
+    <Card className="border-border/50 flex flex-col">
+      <CardHeader className="pb-3">
+        <div className="flex items-start gap-3">
+          <div
+            className={`h-9 w-9 rounded-lg ${iconBg} flex items-center justify-center shrink-0`}
+          >
+            <Icon className={`h-5 w-5 ${iconColor}`} />
+          </div>
+          <div className="min-w-0">
+            <CardTitle className="text-sm font-semibold leading-tight">
+              {name}
+            </CardTitle>
+            <p className="text-xs text-muted-foreground mt-0.5 leading-snug">
+              {description}
+            </p>
+          </div>
+        </div>
+
+        {/* Summary stats */}
+        <div className="flex gap-6 mt-3 pt-3 border-t border-border/40">
+          <Stat value={totalModels} label="modelos" />
+          <Stat value={totalPeriods} label="períodos" />
+        </div>
+      </CardHeader>
+
+      <CardContent className="pt-0 flex-1">
+        {models.length === 0 ? (
+          <p className="text-xs text-muted-foreground italic">
+            Sin modelos creados
+          </p>
+        ) : (
+          <div>
+            {models.map((m) => (
+              <ModelRow
+                key={m.id}
+                name={m.name}
+                periodCount={periodsByModel[m.id] ?? 0}
+              />
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════
+   DASHBOARD
+══════════════════════════════════════════════════════════ */
 const Index = () => {
   const { tenant, loading: tenantLoading } = useTenant();
-  const resources = useResources();
-  const activities = useActivities();
-  const kpis = useKPIs();
-  const perspectives = usePerspectives();
+
+  const abcModels = useModels();
+  const biModels = useBIModels();
+  const logisticsModels = useLogisticsModels();
+  const forecastModels = useForecastModels();
+  const bscModels = useBSCModels();
+  const periods = usePeriods();
 
   const isLoading =
     tenantLoading ||
-    resources.isLoading ||
-    activities.isLoading ||
-    kpis.isLoading ||
-    perspectives.isLoading;
+    abcModels.isLoading ||
+    biModels.isLoading ||
+    logisticsModels.isLoading ||
+    forecastModels.isLoading ||
+    bscModels.isLoading ||
+    periods.isLoading;
 
-  // Computed summary
-  const totalCost = resources.items.reduce(
-    (sum, r) => sum + (r.amount || 0),
-    0,
-  );
-  const activeActivities = activities.items.length;
-  const greenKpis = kpis.items.filter(
-    (k) => getKPIStatus(k) === "success",
-  ).length;
-  const totalKpis = kpis.items.length;
+  /* Build a map: modelId → period count */
+  const periodsByModel: Record<string, number> = {};
+  for (const p of periods.items) {
+    if (p.model_id) {
+      periodsByModel[p.model_id] = (periodsByModel[p.model_id] ?? 0) + 1;
+    }
+  }
 
-  const summaryCards = [
-    {
-      label: "Costo Total Asignado",
-      value: `$${totalCost.toLocaleString("en-US")}`,
-      icon: DollarSign,
-      change: `${resources.items.length} recursos`,
-    },
-    {
-      label: "Actividades Activas",
-      value: String(activeActivities),
-      icon: Activity,
-      change: "en diccionario",
-    },
-    {
-      label: "KPIs en Verde",
-      value: totalKpis > 0 ? `${greenKpis}/${totalKpis}` : "—",
-      icon: Target,
-      change:
-        totalKpis > 0
-          ? `${Math.round((greenKpis / totalKpis) * 100)}%`
-          : "sin KPIs",
-    },
-    {
-      label: "Tenant",
-      value: tenant?.name || "—",
-      icon: TrendingUp,
-      change: tenant?.plan || "",
-    },
-  ];
-
-  // KPIs for gauges (take first 3)
-  const gaugeKpis = kpis.items.slice(0, 3).map((k) => ({
-    name: k.name,
-    value: Math.min(100, Math.max(0, k.current_value)),
-    status: getKPIStatus(k),
-  }));
-
-  // Strategic map from perspectives + KPIs
-  const strategicMap = perspectives.items.map((p) => ({
-    perspective: p.name,
-    kpis: kpis.items
-      .filter((k) => k.perspective_id === p.id)
-      .map((k) => ({
-        name: k.name,
-        score: k.current_value,
-        status: getKPIStatus(k),
-      })),
-  }));
+  const totalModels =
+    abcModels.items.length +
+    biModels.items.length +
+    logisticsModels.items.length +
+    forecastModels.items.length +
+    bscModels.items.length;
 
   if (isLoading) {
     return (
@@ -140,111 +171,114 @@ const Index = () => {
         description="Vista general del desempeño corporativo"
       />
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {summaryCards.map((card) => (
-          <Card key={card.label} className="border-border/50">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">{card.label}</p>
-                  <p className="text-2xl font-bold mt-1">{card.value}</p>
-                  <p className="text-xs text-primary mt-1">{card.change}</p>
-                </div>
-                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <card.icon className="h-5 w-5 text-primary" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Gauges Row */}
-      {gaugeKpis.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-          {gaugeKpis.map((kpi) => (
-            <Card key={kpi.name} className="border-border/50">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {kpi.name}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex justify-center pb-4">
-                <GaugeChart value={kpi.value} status={kpi.status} />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {/* Histogram */}
-      <Card className="border-border/50 mb-8">
-        <CardHeader>
-          <CardTitle className="text-sm font-medium">
-            Tendencia de Costos vs Objetivo
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={280}>
-            <BarChart data={histogramData}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="hsl(var(--border))"
-              />
-              <XAxis
-                dataKey="month"
-                stroke="hsl(var(--muted-foreground))"
-                fontSize={12}
-              />
-              <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "hsl(var(--card))",
-                  border: "1px solid hsl(var(--border))",
-                  borderRadius: "8px",
-                  color: "hsl(var(--foreground))",
-                }}
-              />
-              <Bar
-                dataKey="actual"
-                fill="hsl(var(--primary))"
-                radius={[4, 4, 0, 0]}
-                name="Real"
-              />
-              <Bar
-                dataKey="target"
-                fill="hsl(var(--muted-foreground))"
-                radius={[4, 4, 0, 0]}
-                name="Objetivo"
-                opacity={0.4}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      {/* Strategic Map */}
-      {strategicMap.length > 0 && (
+      {/* ── Global summary ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        {/* Tenant */}
         <Card className="border-border/50">
-          <CardHeader>
-            <CardTitle className="text-sm font-medium">
-              Mapa Estratégico
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {strategicMap.map((perspective) => (
-                <StrategicMapCard
-                  key={perspective.perspective}
-                  perspective={perspective.perspective}
-                  kpis={perspective.kpis}
-                />
-              ))}
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-muted-foreground">Organización</p>
+                <p className="text-2xl font-bold mt-1">
+                  {tenant?.name ?? "—"}
+                </p>
+                <p className="text-xs text-primary mt-1 capitalize">
+                  {tenant?.plan ?? ""}
+                </p>
+              </div>
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Building2 className="h-5 w-5 text-primary" />
+              </div>
             </div>
           </CardContent>
         </Card>
-      )}
+
+        {/* Total models */}
+        <Card className="border-border/50">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-muted-foreground">
+                  Modelos creados
+                </p>
+                <p className="text-2xl font-bold mt-1">{totalModels}</p>
+                <p className="text-xs text-primary mt-1">en todas las herramientas</p>
+              </div>
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Box className="h-5 w-5 text-primary" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* BSC models */}
+        <Card className="border-border/50">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-muted-foreground">Modelos BSC</p>
+                <p className="text-2xl font-bold mt-1">{bscModels.items.length}</p>
+                <p className="text-xs text-primary mt-1">Balanced Scorecard</p>
+              </div>
+              <div className="h-10 w-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                <Target className="h-5 w-5 text-emerald-500" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* ── Herramientas de Análisis ── */}
+      <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-3">
+        Herramientas de análisis
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+        <ToolCard
+          icon={Calculator}
+          iconColor="text-primary"
+          iconBg="bg-primary/10"
+          name="Costeo ABC"
+          description="Asignación de costos por actividades"
+          models={abcModels.items}
+          periodsByModel={periodsByModel}
+        />
+        <ToolCard
+          icon={BarChart2}
+          iconColor="text-blue-400"
+          iconBg="bg-blue-400/10"
+          name="BI Express"
+          description="Análisis de rentabilidad y KPIs comerciales"
+          models={biModels.items}
+          periodsByModel={periodsByModel}
+        />
+        <ToolCard
+          icon={Truck}
+          iconColor="text-orange-400"
+          iconBg="bg-orange-400/10"
+          name="Eficiencia Logística"
+          description="Punto de equilibrio y análisis de rutas"
+          models={logisticsModels.items}
+          periodsByModel={periodsByModel}
+        />
+        <ToolCard
+          icon={TrendingUp}
+          iconColor="text-purple-400"
+          iconBg="bg-purple-400/10"
+          name="Forecast"
+          description="Proyección de series de tiempo"
+          models={forecastModels.items}
+          periodsByModel={periodsByModel}
+        />
+        <ToolCard
+          icon={Target}
+          iconColor="text-emerald-500"
+          iconBg="bg-emerald-500/10"
+          name="Estrategia BSC"
+          description="Balanced Scorecard y KPIs estratégicos"
+          models={bscModels.items}
+          periodsByModel={periodsByModel}
+        />
+      </div>
     </AppLayout>
   );
 };

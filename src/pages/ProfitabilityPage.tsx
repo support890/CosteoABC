@@ -206,7 +206,6 @@ const ProfitabilityPage = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-20">Código</TableHead>
                     <TableHead>Nombre</TableHead>
                     <TableHead className="w-24">Tipo</TableHead>
                     <TableHead className="w-32">Categoría</TableHead>
@@ -223,10 +222,12 @@ const ProfitabilityPage = () => {
                     .sort((a, b) => b.margin - a.margin)
                     .map((item) => (
                       <TableRow key={item.id}>
-                        <TableCell className="font-mono text-xs">
-                          {item.code}
+                        <TableCell>
+                          <div className="flex flex-col gap-0.5">
+                            <span className="font-mono text-sm text-muted-foreground leading-tight">{item.code}</span>
+                            <span className="text-sm">{item.name}</span>
+                          </div>
                         </TableCell>
-                        <TableCell className="font-medium">{item.name}</TableCell>
                         <TableCell>
                           <Badge variant="secondary" className="text-xs">
                             {subtypeLabels[item.type] || item.type}
@@ -235,10 +236,10 @@ const ProfitabilityPage = () => {
                         <TableCell className="text-xs text-muted-foreground">
                           {item.category ?? "—"}
                         </TableCell>
-                        <TableCell className="text-right font-mono text-xs">
+                        <TableCell className="text-right font-mono text-sm">
                           {fmt(item.price)}
                         </TableCell>
-                        <TableCell className="text-right font-mono text-xs">
+                        <TableCell className="text-right font-mono text-sm">
                           {fmt(item.cost)}
                         </TableCell>
                         <TableCell
@@ -249,7 +250,7 @@ const ProfitabilityPage = () => {
                           {fmt(item.margin)}
                         </TableCell>
                         <TableCell
-                          className={`text-right font-mono text-xs ${
+                          className={`text-right font-mono text-sm ${
                             item.marginPct >= 0
                               ? "text-emerald-600"
                               : "text-red-600"
@@ -261,17 +262,17 @@ const ProfitabilityPage = () => {
                     ))}
                   {/* Totals */}
                   <TableRow className="bg-muted/50 font-semibold">
-                    <TableCell colSpan={4} className="text-right">
+                    <TableCell colSpan={3} className="text-right">
                       TOTAL
                     </TableCell>
-                    <TableCell className="text-right font-mono text-xs">
+                    <TableCell className="text-right font-mono text-sm">
                       {fmt(profitData.totalRevenue)}
                     </TableCell>
-                    <TableCell className="text-right font-mono text-xs">
+                    <TableCell className="text-right font-mono text-sm">
                       {fmt(profitData.totalCost)}
                     </TableCell>
                     <TableCell
-                      className={`text-right font-mono ${
+                      className={`text-right font-mono text-sm ${
                         profitData.totalMargin >= 0
                           ? "text-emerald-600"
                           : "text-red-600"
@@ -280,7 +281,7 @@ const ProfitabilityPage = () => {
                       {fmt(profitData.totalMargin)}
                     </TableCell>
                     <TableCell
-                      className={`text-right font-mono text-xs ${
+                      className={`text-right font-mono text-sm ${
                         profitData.avgMarginPct >= 0
                           ? "text-emerald-600"
                           : "text-red-600"
@@ -306,7 +307,6 @@ const ProfitabilityPage = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-20">Código</TableHead>
                       <TableHead>Nombre</TableHead>
                       <TableHead className="w-24">Tipo</TableHead>
                       <TableHead className="text-right">Costo ABC</TableHead>
@@ -315,11 +315,11 @@ const ProfitabilityPage = () => {
                   <TableBody>
                     {noPriceItems.map((item) => (
                       <TableRow key={item.id}>
-                        <TableCell className="font-mono text-xs">
-                          {item.code}
-                        </TableCell>
-                        <TableCell className="font-medium text-muted-foreground">
-                          {item.name}
+                        <TableCell>
+                          <div className="flex flex-col gap-0.5">
+                            <span className="font-mono text-sm text-muted-foreground leading-tight">{item.code}</span>
+                            <span className="text-sm">{item.name}</span>
+                          </div>
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline" className="text-xs">

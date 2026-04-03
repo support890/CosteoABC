@@ -9,6 +9,7 @@ import { ModelProvider } from "@/contexts/ModelContext";
 import { BIExpressProvider } from "@/contexts/BIExpressContext";
 import { LogisticsProvider } from "@/contexts/LogisticsContext";
 import { ForecastProvider } from "@/contexts/ForecastContext";
+import { BSCProvider } from "@/contexts/BSCContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import LandingPage from "./pages/LandingPage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
@@ -41,6 +42,7 @@ import LogisticsModelsPage from "./pages/LogisticsModelsPage.tsx";
 import LogisticsPage from "./pages/LogisticsPage.tsx";
 import ForecastModelsPage from "./pages/ForecastModelsPage.tsx";
 import ForecastPage from "./pages/ForecastPage.tsx";
+import BSCModelsPage from "./pages/BSCModelsPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -53,6 +55,7 @@ const App = () => (
         <BIExpressProvider>
         <LogisticsProvider>
         <ForecastProvider>
+        <BSCProvider>
         <TooltipProvider>
           <Toaster />
           <Sonner />
@@ -284,6 +287,31 @@ const App = () => (
                 }
               />
               <Route
+                path="/bsc"
+                element={
+                  <ProtectedRoute>
+                    <BSCModelsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/bsc/strategy"
+                element={
+                  <ProtectedRoute>
+                    <StrategyPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/bsc/analytics"
+                element={
+                  <ProtectedRoute>
+                    <AnalyticsPage />
+                  </ProtectedRoute>
+                }
+              />
+              {/* Legacy redirects — kept for backward compat */}
+              <Route
                 path="/strategy"
                 element={
                   <ProtectedRoute>
@@ -303,6 +331,7 @@ const App = () => (
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
+        </BSCProvider>
         </ForecastProvider>
         </LogisticsProvider>
         </BIExpressProvider>

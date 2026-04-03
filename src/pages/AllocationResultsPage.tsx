@@ -138,18 +138,18 @@ const AllocationResultsPage = () => {
         </Card>
       ) : (
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList>
-            <TabsTrigger value="resources">
+          <TabsList className="w-full grid grid-cols-2 md:grid-cols-4 h-auto">
+            <TabsTrigger value="resources" className="text-xs py-2">
               Recursos ({allocation.resources.length})
             </TabsTrigger>
-            <TabsTrigger value="activities">
+            <TabsTrigger value="activities" className="text-xs py-2">
               Actividades ({allocation.activitySummaries.length})
             </TabsTrigger>
-            <TabsTrigger value="cost_objects">
-              Objetos de Costo ({allocation.costObjectSummaries.length})
+            <TabsTrigger value="cost_objects" className="text-xs py-2">
+              Obj. Costo ({allocation.costObjectSummaries.length})
             </TabsTrigger>
-            <TabsTrigger value="detail">
-              Detalle de Asignaciones ({allocation.allocations.length})
+            <TabsTrigger value="detail" className="text-xs py-2">
+              Detalle ({allocation.allocations.length})
             </TabsTrigger>
           </TabsList>
 

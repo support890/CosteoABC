@@ -1663,20 +1663,13 @@ function ResourceTreeView({
     resources.filter((r) => r.center_id === centerId);
   const orphanResources = resources.filter((r) => !r.center_id);
 
-  // Sort: most recently updated first so dragged resources appear at top
   const sortedGetResources = (centerId: string) =>
     getResources(centerId)
       .slice()
-      .sort((a, b) => {
-        const ua = (a as any).updated_at || "";
-        const ub = (b as any).updated_at || "";
-        return ub.localeCompare(ua);
-      });
-  const sortedOrphanResources = orphanResources.slice().sort((a, b) => {
-    const ua = (a as any).updated_at || "";
-    const ub = (b as any).updated_at || "";
-    return ub.localeCompare(ua);
-  });
+      .sort((a, b) => (a.code || "").localeCompare(b.code || ""));
+  const sortedOrphanResources = orphanResources
+    .slice()
+    .sort((a, b) => (a.code || "").localeCompare(b.code || ""));
 
   const getCenterAllocated = (centerId: string): number => {
     const directAllocated = allocatedMap?.[centerId] || 0;
@@ -1903,15 +1896,14 @@ function ResourceTreeView({
             <circle cx="5" cy="9" r="1" />
           </svg>
         </div>
-        <span className="font-mono text-xs text-muted-foreground w-20 shrink-0">
-          {item.code}
-        </span>
-        <span
-          className="text-sm flex-1 truncate"
-          title={item.category || undefined}
-        >
-          {item.name}
-        </span>
+        <div className="flex flex-col flex-1 min-w-0">
+          <span className="font-mono text-sm text-muted-foreground leading-tight">
+            {item.code}
+          </span>
+          <span className="text-sm truncate" title={item.name}>
+            {item.name}
+          </span>
+        </div>
         <Badge
           variant="secondary"
           className={`${color} w-24 justify-center text-[10px]`}
@@ -1925,23 +1917,23 @@ function ResourceTreeView({
         >
           {item.category || "—"}
         </Badge>
-        <span className="font-mono text-xs w-28 text-right">
+        <span className="font-mono text-sm w-28 text-right">
           {item.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}
         </span>
-        <span className="font-mono text-xs w-36 text-right text-blue-500/70">
+        <span className="font-mono text-sm w-36 text-right text-blue-500/70">
           0.00
         </span>
-        <span className="font-mono text-xs w-28 text-right text-muted-foreground">
+        <span className="font-mono text-sm w-28 text-right text-muted-foreground">
           {received.toLocaleString("en-US", { minimumFractionDigits: 2 })}
         </span>
-        <span className="font-mono text-xs w-28 text-right font-medium">
+        <span className="font-mono text-sm w-28 text-right font-medium">
           {totalCost.toLocaleString("en-US", { minimumFractionDigits: 2 })}
         </span>
-        <span className="font-mono text-xs w-28 text-right text-muted-foreground">
+        <span className="font-mono text-sm w-28 text-right text-muted-foreground">
           {allocated.toLocaleString("en-US", { minimumFractionDigits: 2 })}
         </span>
         <span
-          className={`font-mono text-xs w-28 text-right font-medium ${remaining < -0.01 ? "text-destructive" : Math.abs(remaining) < 0.01 ? "text-green-600" : "text-amber-600"}`}
+          className={`font-mono text-sm w-28 text-right font-medium ${remaining < -0.01 ? "text-destructive" : Math.abs(remaining) < 0.01 ? "text-green-600" : "text-amber-600"}`}
         >
           {remaining.toLocaleString("en-US", { minimumFractionDigits: 2 })}
         </span>
@@ -2081,22 +2073,22 @@ function ResourceTreeView({
           >
             {centerTypeLabel}
           </Badge>
-          <span className="font-mono text-xs w-28 text-right font-medium">
+          <span className="font-mono text-sm w-28 text-right font-medium">
             {getCenterMonto(center.id).toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </span>
-          <span className="font-mono text-xs w-36 text-right text-blue-500">
+          <span className="font-mono text-sm w-36 text-right text-blue-500">
             {centerReceivedInCenter.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </span>
-          <span className="font-mono text-xs w-28 text-right text-muted-foreground">
+          <span className="font-mono text-sm w-28 text-right text-muted-foreground">
             {centerReceived.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </span>
-          <span className="font-mono text-xs w-28 text-right font-semibold">
+          <span className="font-mono text-sm w-28 text-right font-semibold">
             {totalAmount.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </span>
-          <span className="font-mono text-xs w-28 text-right text-muted-foreground">
+          <span className="font-mono text-sm w-28 text-right text-muted-foreground">
             {getCenterAllocated(center.id).toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </span>
-          <span className={`font-mono text-xs w-28 text-right font-medium ${(totalAmount - getCenterAllocated(center.id)) < -0.01 ? "text-destructive" : Math.abs(totalAmount - getCenterAllocated(center.id)) < 0.01 ? "text-green-600" : "text-amber-600"}`}>
+          <span className={`font-mono text-sm w-28 text-right font-medium ${(totalAmount - getCenterAllocated(center.id)) < -0.01 ? "text-destructive" : Math.abs(totalAmount - getCenterAllocated(center.id)) < 0.01 ? "text-green-600" : "text-amber-600"}`}>
             {(totalAmount - getCenterAllocated(center.id)).toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </span>
           <div
@@ -2187,8 +2179,7 @@ function ResourceTreeView({
       <div className="flex items-center gap-2 py-2 px-3 border-b border-border bg-muted/40 text-xs font-medium text-muted-foreground sticky top-0">
         <span className="w-4" />
         <span className="w-4" />
-        <span className="w-20 shrink-0">Código</span>
-        <span className="flex-1">Nombre</span>
+        <span className="flex-1">Código / Nombre</span>
         <span className="w-24 text-center">Tipo</span>
         <span className="w-28 text-center">Categoría</span>
         <span className="w-28 text-right">Monto ({currencySymbol})</span>
@@ -2594,16 +2585,10 @@ function ActivityTreeView({
   const sortedGetActivities = (centerId: string) =>
     getActivities(centerId)
       .slice()
-      .sort((a, b) => {
-        const ua = (a as any).updated_at || "";
-        const ub = (b as any).updated_at || "";
-        return ub.localeCompare(ua);
-      });
-  const sortedOrphanActivities = orphanActivities.slice().sort((a, b) => {
-    const ua = (a as any).updated_at || "";
-    const ub = (b as any).updated_at || "";
-    return ub.localeCompare(ua);
-  });
+      .sort((a, b) => (a.code || "").localeCompare(b.code || ""));
+  const sortedOrphanActivities = orphanActivities
+    .slice()
+    .sort((a, b) => (a.code || "").localeCompare(b.code || ""));
 
   const getCenterReceivedInCenter = (centerId: string): number => {
     const directCenterReceived = centerReceivedMap?.[centerId] || 0;
@@ -2822,10 +2807,14 @@ function ActivityTreeView({
             <circle cx="5" cy="9" r="1" />
           </svg>
         </div>
-        <span className="font-mono text-xs text-muted-foreground w-20 shrink-0">
-          {item.code}
-        </span>
-        <span className="text-sm flex-1 truncate">{item.name}</span>
+        <div className="flex flex-col flex-1 min-w-0">
+          <span className="font-mono text-sm text-muted-foreground leading-tight">
+            {item.code}
+          </span>
+          <span className="text-sm truncate" title={item.name}>
+            {item.name}
+          </span>
+        </div>
         <Badge
           variant="secondary"
           className={`${color} w-24 justify-center text-[10px]`}
@@ -2839,23 +2828,23 @@ function ActivityTreeView({
         >
           {item.category || "—"}
         </Badge>
-        <span className="font-mono text-xs w-28 text-right">
+        <span className="font-mono text-sm w-28 text-right">
           {item.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}
         </span>
-        <span className="font-mono text-xs w-36 text-right text-blue-500/70">
+        <span className="font-mono text-sm w-36 text-right text-blue-500/70">
           0.00
         </span>
-        <span className="font-mono text-xs w-28 text-right text-muted-foreground">
+        <span className="font-mono text-sm w-28 text-right text-muted-foreground">
           {received.toLocaleString("en-US", { minimumFractionDigits: 2 })}
         </span>
-        <span className="font-mono text-xs w-28 text-right font-medium">
+        <span className="font-mono text-sm w-28 text-right font-medium">
           {totalCost.toLocaleString("en-US", { minimumFractionDigits: 2 })}
         </span>
-        <span className="font-mono text-xs w-28 text-right text-muted-foreground">
+        <span className="font-mono text-sm w-28 text-right text-muted-foreground">
           {allocated.toLocaleString("en-US", { minimumFractionDigits: 2 })}
         </span>
         <span
-          className={`font-mono text-xs w-28 text-right font-medium ${remaining < -0.01 ? "text-destructive" : Math.abs(remaining) < 0.01 ? "text-green-600" : "text-amber-600"}`}
+          className={`font-mono text-sm w-28 text-right font-medium ${remaining < -0.01 ? "text-destructive" : Math.abs(remaining) < 0.01 ? "text-green-600" : "text-amber-600"}`}
         >
           {remaining.toLocaleString("en-US", { minimumFractionDigits: 2 })}
         </span>
@@ -2999,22 +2988,22 @@ function ActivityTreeView({
             {centerTypeLabel}
           </Badge>
           <span className="w-28" />
-          <span className="font-mono text-xs w-28 text-right font-medium">
+          <span className="font-mono text-sm w-28 text-right font-medium">
             {directAmount.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </span>
-          <span className="font-mono text-xs w-36 text-right text-blue-500">
+          <span className="font-mono text-sm w-36 text-right text-blue-500">
             {finalReceivedInCenter.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </span>
-          <span className="font-mono text-xs w-28 text-right text-muted-foreground">
+          <span className="font-mono text-sm w-28 text-right text-muted-foreground">
             {finalReceived.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </span>
-          <span className="font-mono text-xs w-28 text-right font-semibold">
+          <span className="font-mono text-sm w-28 text-right font-semibold">
             {finalTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </span>
-          <span className="font-mono text-xs w-28 text-right text-muted-foreground">
+          <span className="font-mono text-sm w-28 text-right text-muted-foreground">
             {finalAllocated.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </span>
-          <span className={`font-mono text-xs w-28 text-right font-medium ${(finalTotal - finalAllocated) < -0.01 ? "text-destructive" : Math.abs(finalTotal - finalAllocated) < 0.01 ? "text-green-600" : "text-amber-600"}`}>
+          <span className={`font-mono text-sm w-28 text-right font-medium ${(finalTotal - finalAllocated) < -0.01 ? "text-destructive" : Math.abs(finalTotal - finalAllocated) < 0.01 ? "text-green-600" : "text-amber-600"}`}>
             {(finalTotal - finalAllocated).toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </span>
           <div
@@ -3100,8 +3089,7 @@ function ActivityTreeView({
       <div className="flex items-center gap-2 py-2 px-3 border-b border-border bg-muted/40 text-xs font-medium text-muted-foreground sticky top-0">
         <span className="w-4" />
         <span className="w-4" />
-        <span className="w-20 shrink-0">Código</span>
-        <span className="flex-1">Nombre</span>
+        <span className="flex-1">Código / Nombre</span>
         <span className="w-24 text-center">Tipo</span>
         <span className="w-28 text-center">Categoría</span>
         <span className="w-28 text-right">C. Directo ({currencySymbol})</span>
@@ -3500,16 +3488,10 @@ function CostObjectTreeView({
   const sortedGetCostObjects = (centerId: string) =>
     getCostObjects(centerId)
       .slice()
-      .sort((a, b) => {
-        const ua = (a as any).updated_at || "";
-        const ub = (b as any).updated_at || "";
-        return ub.localeCompare(ua);
-      });
-  const sortedOrphanCostObjects = orphanCostObjects.slice().sort((a, b) => {
-    const ua = (a as any).updated_at || "";
-    const ub = (b as any).updated_at || "";
-    return ub.localeCompare(ua);
-  });
+      .sort((a, b) => (a.code || "").localeCompare(b.code || ""));
+  const sortedOrphanCostObjects = orphanCostObjects
+    .slice()
+    .sort((a, b) => (a.code || "").localeCompare(b.code || ""));
 
   const getCenterReceivedInCenter = (centerId: string): number => {
     const directCenterReceived = centerReceivedMap?.[centerId] || 0;
@@ -3713,10 +3695,14 @@ function CostObjectTreeView({
             <circle cx="5" cy="9" r="1" />
           </svg>
         </div>
-        <span className="font-mono text-xs text-muted-foreground w-20 shrink-0">
-          {item.code}
-        </span>
-        <span className="text-sm flex-1 truncate">{item.name}</span>
+        <div className="flex flex-col flex-1 min-w-0">
+          <span className="font-mono text-sm text-muted-foreground leading-tight">
+            {item.code}
+          </span>
+          <span className="text-sm truncate" title={item.name}>
+            {item.name}
+          </span>
+        </div>
         <Badge
           variant="secondary"
           className={`${color} w-24 justify-center text-[10px]`}
@@ -3730,19 +3716,19 @@ function CostObjectTreeView({
         >
           {item.category || "—"}
         </Badge>
-        <span className="font-mono text-xs w-28 text-right">
+        <span className="font-mono text-sm w-28 text-right">
           {item.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}
         </span>
-        <span className="font-mono text-xs w-36 text-right text-blue-500/70">
+        <span className="font-mono text-sm w-36 text-right text-blue-500/70">
           0.00
         </span>
-        <span className="font-mono text-xs w-28 text-right text-muted-foreground">
+        <span className="font-mono text-sm w-28 text-right text-muted-foreground">
           {received.toLocaleString("en-US", { minimumFractionDigits: 2 })}
         </span>
-        <span className="font-mono text-xs w-28 text-right font-medium">
+        <span className="font-mono text-sm w-28 text-right font-medium">
           {totalCost.toLocaleString("en-US", { minimumFractionDigits: 2 })}
         </span>
-        <span className="font-mono text-xs w-28 text-right text-primary">
+        <span className="font-mono text-sm w-28 text-right text-primary">
           {item.price?.toLocaleString("en-US", {
             minimumFractionDigits: 2,
           }) || "0.00"}
@@ -3892,19 +3878,19 @@ function CostObjectTreeView({
             {centerTypeLabel}
           </Badge>
           <span className="w-28" />
-          <span className="font-mono text-xs w-28 text-right font-medium">
+          <span className="font-mono text-sm w-28 text-right font-medium">
             {totalAmount.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </span>
-          <span className="font-mono text-xs w-36 text-right text-blue-500">
+          <span className="font-mono text-sm w-36 text-right text-blue-500">
             {finalReceivedInCenter.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </span>
-          <span className="font-mono text-xs w-28 text-right text-muted-foreground">
+          <span className="font-mono text-sm w-28 text-right text-muted-foreground">
             {finalReceived.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </span>
-          <span className="font-mono text-xs w-28 text-right font-semibold">
+          <span className="font-mono text-sm w-28 text-right font-semibold">
             {finalTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </span>
-          <span className="font-mono text-xs w-28 text-right text-primary font-medium">
+          <span className="font-mono text-sm w-28 text-right text-primary font-medium">
             {finalSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </span>
           <span className="w-28" />
@@ -3991,8 +3977,7 @@ function CostObjectTreeView({
       <div className="flex items-center gap-2 py-2 px-3 border-b border-border bg-muted/40 text-xs font-medium text-muted-foreground sticky top-0">
         <span className="w-4" />
         <span className="w-4" />
-        <span className="w-20 shrink-0">Código</span>
-        <span className="flex-1">Nombre</span>
+        <span className="flex-1">Código / Nombre</span>
         <span className="w-24 text-center">Tipo</span>
         <span className="w-28 text-center">Categoría</span>
         <span className="w-28 text-right">C. Directo ({currencySymbol})</span>
@@ -4994,44 +4979,51 @@ const DictionariesPage = () => {
         </div>
       ) : (
         <Tabs value={activeTab} onValueChange={setActiveTab}>
+          {(() => {
+            const rT = resourcesGrandTotal;
+            const aT = activitiesGrandTotal;
+            const oT = costObjectsGrandTotal;
+            const allEqual = rT > 0 && Math.abs(rT - aT) < 0.01 && Math.abs(aT - oT) < 0.01;
+            const actOk  = aT > 0 && Math.abs(aT - rT) < 0.01;
+            const objOk  = oT > 0 && Math.abs(oT - aT) < 0.01;
+            const actWarn = aT > 0 && !actOk;
+            const objWarn = oT > 0 && !objOk;
+            const fmtT = (n: number) => n.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            return (
           <TabsList className="h-auto py-1 w-full grid grid-cols-3">
             <TabsTrigger value="resources" className="flex flex-col items-center gap-0.5 py-2">
               <span>
                 Recursos ({resources.items.length}
-                {costCenters.items.length > 0
-                  ? ` / ${costCenters.items.length} centros`
-                  : ""}
-                )
+                {costCenters.items.length > 0 ? ` / ${costCenters.items.length} centros` : ""})
               </span>
-              <span className="text-xs font-normal text-muted-foreground">
-                Total: {resourcesGrandTotal.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {currencySymbol}
+              <span className={`text-xs font-normal inline-flex items-center gap-1 leading-none ${allEqual ? "text-green-500" : "text-muted-foreground"}`}>
+                {allEqual && <CheckCircle2 className="h-3 w-3" />}
+                Total: {fmtT(rT)} {currencySymbol}
               </span>
             </TabsTrigger>
             <TabsTrigger value="activities" className="flex flex-col items-center gap-0.5 py-2">
               <span>
                 Actividades ({activities.items.length}
-                {activityCenters.items.length > 0
-                  ? ` / ${activityCenters.items.length} centros`
-                  : ""}
-                )
+                {activityCenters.items.length > 0 ? ` / ${activityCenters.items.length} centros` : ""})
               </span>
-              <span className="text-xs font-normal text-muted-foreground">
-                Total: {activitiesGrandTotal.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {currencySymbol}
+              <span className={`text-xs font-normal inline-flex items-center gap-1 leading-none ${actOk ? "text-green-500" : actWarn ? "text-amber-500" : "text-muted-foreground"}`}>
+                {actOk && <CheckCircle2 className="h-3 w-3" />}
+                Total: {fmtT(aT)} {currencySymbol}
               </span>
             </TabsTrigger>
             <TabsTrigger value="objects" className="flex flex-col items-center gap-0.5 py-2">
               <span>
                 Objetos de Costo ({costObjects.items.length}
-                {costObjectCenters.items.length > 0
-                  ? ` / ${costObjectCenters.items.length} centros`
-                  : ""}
-                )
+                {costObjectCenters.items.length > 0 ? ` / ${costObjectCenters.items.length} centros` : ""})
               </span>
-              <span className="text-xs font-normal text-muted-foreground">
-                Total: {costObjectsGrandTotal.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {currencySymbol}
+              <span className={`text-xs font-normal inline-flex items-center gap-1 leading-none ${objOk ? "text-green-500" : objWarn ? "text-amber-500" : "text-muted-foreground"}`}>
+                {objOk && <CheckCircle2 className="h-3 w-3" />}
+                Total: {fmtT(oT)} {currencySymbol}
               </span>
             </TabsTrigger>
           </TabsList>
+            );
+          })()}
 
           <TabsContent value="resources">
             <Card className="border-border/50 mt-4">

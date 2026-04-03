@@ -151,8 +151,8 @@ export default function ForecastModelsPage() {
 
   return (
     <AppLayout>
-      <div className="flex flex-col gap-6 p-6">
-        <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
           <PageHeader
             title="Forecast"
             description="Predicción de ventas basada en datos históricos con algoritmos estadísticos avanzados"

@@ -593,6 +593,8 @@ function ComparisonTable({
   currentLabel: string;
   compareLabel: string;
 }) {
+  const { fmt } = useCurrency();
+
   if (rows.length === 0) return null;
 
   const totalCurrent = rows.reduce((s, r) => s + r.currentValue, 0);

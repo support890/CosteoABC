@@ -570,14 +570,14 @@ const CostCenterAnalysisPage = () => {
         </Card>
       ) : (
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList>
-            <TabsTrigger value="resource_centers">
+          <TabsList className="w-full grid grid-cols-3 h-auto">
+            <TabsTrigger value="resource_centers" className="text-xs py-2">
               Centros de Recurso
             </TabsTrigger>
-            <TabsTrigger value="activity_centers">
+            <TabsTrigger value="activity_centers" className="text-xs py-2">
               Centros de Actividad
             </TabsTrigger>
-            <TabsTrigger value="cost_object_centers">
+            <TabsTrigger value="cost_object_centers" className="text-xs py-2">
               Centros de Obj. Costo
             </TabsTrigger>
           </TabsList>

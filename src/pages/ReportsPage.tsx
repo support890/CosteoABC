@@ -62,6 +62,7 @@ interface DistributionItem {
   code: string;
   amount: number;
   percentage: number;
+  sourceCodes: { code: string; name: string }[];
 }
 
 interface DistributionFilters {
@@ -156,10 +157,12 @@ function DistributionView({
   title,
   items,
   filters,
+  sourceType,
 }: {
   title: string;
   items: DistributionItem[];
   filters: DistributionFilters;
+  sourceType: "resource" | "activity";
 }) {
   const sortedItems = [...items].sort((a, b) => b.amount - a.amount);
   const total = items.reduce((s, i) => s + i.amount, 0);
@@ -330,21 +333,48 @@ function DistributionView({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-20">Código</TableHead>
                 <TableHead>Nombre</TableHead>
-                <TableHead className="text-right">Monto asignado</TableHead>
+                <TableHead>Orígenes</TableHead>
+                <TableHead className="text-right">Costo asignado</TableHead>
                 <TableHead className="text-right w-20">%</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {sortedItems.map((item, i) => (
                 <TableRow key={item.code + i}>
-                  <TableCell className="font-mono text-xs">{item.code}</TableCell>
-                  <TableCell className="font-medium text-sm">{item.name}</TableCell>
-                  <TableCell className="text-right font-mono text-xs">
+                  <TableCell>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-mono text-sm text-muted-foreground leading-tight">{item.code}</span>
+                      <span className="text-sm">{item.name}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {item.sourceCodes.map(({ code, name }) => (
+                        <Popover key={code}>
+                          <PopoverTrigger asChild>
+                            <span
+                              title={name}
+                              className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-medium border cursor-pointer ${
+                                sourceType === "resource"
+                                  ? "bg-green-500/15 text-green-400 border-green-500/30 hover:bg-green-500/30"
+                                  : "bg-amber-500/15 text-amber-400 border-amber-500/30 hover:bg-amber-500/30"
+                              }`}
+                            >
+                              {code}
+                            </span>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto px-3 py-2 text-xs" side="top">
+                            {name}
+                          </PopoverContent>
+                        </Popover>
+                      ))}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right font-mono text-sm">
                     {fmt(item.amount)}
                   </TableCell>
-                  <TableCell className="text-right font-mono text-xs">
+                  <TableCell className="text-right font-mono text-sm">
                     {item.percentage.toFixed(1)}%
                   </TableCell>
                 </TableRow>
@@ -354,10 +384,10 @@ function DistributionView({
                   <TableCell colSpan={2} className="text-right">
                     TOTAL
                   </TableCell>
-                  <TableCell className="text-right font-mono text-xs">
+                  <TableCell className="text-right font-mono text-sm">
                     {fmt(total)}
                   </TableCell>
-                  <TableCell className="text-right font-mono text-xs">
+                  <TableCell className="text-right font-mono text-sm">
                     100%
                   </TableCell>
                 </TableRow>
@@ -445,24 +475,31 @@ const ReportsPage = () => {
         : afterCategoria.filter((a) => resSelected.includes(a.source_name));
 
     // Aggregate by destination activity
-    const destMap = new Map<string, { code: string; name: string; amount: number }>();
+    const destMap = new Map<string, { code: string; name: string; amount: number; sourceMap: Map<string, string> }>();
     for (const al of filtered) {
       const existing = destMap.get(al.destination_id);
       if (existing) {
         existing.amount += al.allocated_amount;
+        existing.sourceMap.set(al.source_code, al.source_name);
       } else {
         destMap.set(al.destination_id, {
           code: al.destination_code,
           name: al.destination_name,
           amount: al.allocated_amount,
+          sourceMap: new Map([[al.source_code, al.source_name]]),
         });
       }
     }
 
     const total = Array.from(destMap.values()).reduce((s, d) => s + d.amount, 0);
     const items: DistributionItem[] = Array.from(destMap.values()).map((d) => ({
-      ...d,
+      code: d.code,
+      name: d.name,
+      amount: d.amount,
       percentage: total > 0 ? (d.amount / total) * 100 : 0,
+      sourceCodes: Array.from(d.sourceMap.entries())
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([code, name]) => ({ code, name })),
     }));
 
     return { items, allTipos, availableCategorias, availableOrigenes };
@@ -530,24 +567,31 @@ const ReportsPage = () => {
         : afterCategoria.filter((a) => actSelected.includes(a.source_name));
 
     // Aggregate by destination cost object
-    const destMap = new Map<string, { code: string; name: string; amount: number }>();
+    const destMap = new Map<string, { code: string; name: string; amount: number; sourceMap: Map<string, string> }>();
     for (const al of filtered) {
       const existing = destMap.get(al.destination_id);
       if (existing) {
         existing.amount += al.allocated_amount;
+        existing.sourceMap.set(al.source_code, al.source_name);
       } else {
         destMap.set(al.destination_id, {
           code: al.destination_code,
           name: al.destination_name,
           amount: al.allocated_amount,
+          sourceMap: new Map([[al.source_code, al.source_name]]),
         });
       }
     }
 
     const total = Array.from(destMap.values()).reduce((s, d) => s + d.amount, 0);
     const items: DistributionItem[] = Array.from(destMap.values()).map((d) => ({
-      ...d,
+      code: d.code,
+      name: d.name,
+      amount: d.amount,
       percentage: total > 0 ? (d.amount / total) * 100 : 0,
+      sourceCodes: Array.from(d.sourceMap.entries())
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([code, name]) => ({ code, name })),
     }));
 
     return { items, allTipos, availableCategorias, availableOrigenes };
@@ -759,9 +803,9 @@ const ReportsPage = () => {
         </Card>
       ) : (
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList>
-            <TabsTrigger value="res_to_act">Recursos → Actividades</TabsTrigger>
-            <TabsTrigger value="act_to_co">
+          <TabsList className="w-full sm:w-auto flex flex-wrap h-auto gap-1 sm:flex-nowrap sm:h-9">
+            <TabsTrigger value="res_to_act" className="flex-1 text-xs sm:text-sm">Recursos → Actividades</TabsTrigger>
+            <TabsTrigger value="act_to_co" className="flex-1 text-xs sm:text-sm">
               Actividades → Objetos de Costo
             </TabsTrigger>
           </TabsList>
@@ -771,6 +815,7 @@ const ReportsPage = () => {
               title="Detalle: Distribución de recursos en actividades"
               items={resData.items}
               filters={resFilters}
+              sourceType="resource"
             />
           </TabsContent>
 
@@ -779,6 +824,7 @@ const ReportsPage = () => {
               title="Detalle: Distribución de actividades a objetos de costo"
               items={actData.items}
               filters={actFilters}
+              sourceType="activity"
             />
           </TabsContent>
         </Tabs>

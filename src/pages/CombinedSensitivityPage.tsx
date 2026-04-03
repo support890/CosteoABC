@@ -1268,7 +1268,6 @@ const CombinedSensitivityPage = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-20">Código</TableHead>
                       <TableHead>Objeto de costo</TableHead>
                       <TableHead className="text-right">Costo original</TableHead>
                       <TableHead className="text-right">Costo simulado</TableHead>
@@ -1284,36 +1283,40 @@ const CombinedSensitivityPage = () => {
                       const hasPrice = row.price > 0;
                       return (
                         <TableRow key={row.id}>
-                          <TableCell className="font-mono text-xs">{row.code}</TableCell>
-                          <TableCell className="text-sm font-medium">{row.name}</TableCell>
-                          <TableCell className="text-right font-mono text-xs">{fmt(row.original)}</TableCell>
-                          <TableCell className="text-right font-mono text-xs">{fmt(row.simulated)}</TableCell>
+                          <TableCell>
+                            <div className="flex flex-col gap-0.5">
+                              <span className="font-mono text-sm text-muted-foreground leading-tight">{row.code}</span>
+                              <span className="text-sm">{row.name}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right font-mono text-sm">{fmt(row.original)}</TableCell>
+                          <TableCell className="text-right font-mono text-sm">{fmt(row.simulated)}</TableCell>
                           <TableCell
-                            className={`text-right font-mono text-xs font-semibold ${
+                            className={`text-right font-mono text-sm font-semibold ${
                               row.diff < 0 ? "text-red-600" : row.diff > 0 ? "text-emerald-600" : ""
                             }`}
                           >
                             {row.diff !== 0 ? fmt(row.diff) : <span className="text-muted-foreground/40">—</span>}
                           </TableCell>
                           <TableCell
-                            className={`text-right font-mono text-xs ${
+                            className={`text-right font-mono text-sm ${
                               row.diffPct < 0 ? "text-red-600" : row.diffPct > 0 ? "text-emerald-600" : ""
                             }`}
                           >
                             {row.diff !== 0 ? fmtPct(row.diffPct) : <span className="text-muted-foreground/40">—</span>}
                           </TableCell>
-                          <TableCell className="text-right font-mono text-xs border-l border-border/50">
+                          <TableCell className="text-right font-mono text-sm border-l border-border/50">
                             {hasPrice ? fmt(row.price) : <span className="text-muted-foreground/40">—</span>}
                           </TableCell>
                           <TableCell
-                            className={`text-right font-mono text-xs font-semibold ${
+                            className={`text-right font-mono text-sm font-semibold ${
                               !hasPrice ? "text-muted-foreground/40" : row.simulatedMargin > 0 ? "text-emerald-600" : "text-red-600"
                             }`}
                           >
                             {hasPrice ? fmt(row.simulatedMargin) : "—"}
                           </TableCell>
                           <TableCell
-                            className={`text-right font-mono text-xs ${
+                            className={`text-right font-mono text-sm ${
                               !hasPrice ? "text-muted-foreground/40" : row.simulatedMargin > 0 ? "text-emerald-600" : "text-red-600"
                             }`}
                           >
