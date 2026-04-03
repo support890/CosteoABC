@@ -292,7 +292,7 @@ export function AppSidebar() {
 
       <SidebarFooter className="p-2 space-y-1">
         {!collapsed && user && (
-          <p className="px-2 text-[11px] text-muted-foreground truncate">
+          <p className="px-2 text-[11px] text-muted-foreground truncate text-center">
             {user.email}
           </p>
         )}
