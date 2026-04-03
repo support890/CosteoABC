@@ -28,6 +28,9 @@ import {
   Briefcase,
   GraduationCap,
   FileSpreadsheet,
+  PieChart,
+  Truck,
+  TrendingUp,
 } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 
@@ -44,42 +47,42 @@ const features = [
     icon: BarChart3,
     title: "Costeo ABC",
     description:
-      "Motor de cálculo recursivo que rastrea Recursos, Actividades y Objetos de Costo con precisión absoluta.",
+      "Motor de cálculo recursivo de n-niveles que rastrea Recursos, Actividades y Objetos de Costo con trazabilidad y precisión absoluta.",
   },
   {
-    slug: "balanced-scorecard",
-    icon: Target,
-    title: "Balanced Scorecard",
+    slug: "bi-express",
+    icon: PieChart,
+    title: "BI Express",
     description:
-      "Mapas estratégicos, KPIs jerárquicos y alertas automatizadas para alinear ejecución con visión.",
+      "Dashboards de inteligencia de negocio con KPIs personalizables, catálogo de indicadores y visualizaciones interactivas en tiempo real.",
+  },
+  {
+    slug: "logistica",
+    icon: Truck,
+    title: "Eficiencia Logística",
+    description:
+      "Modela y optimiza costos logísticos con análisis What-If, sensibilidad y resultados desagregados por ruta, canal y cliente.",
+  },
+  {
+    slug: "forecast",
+    icon: TrendingUp,
+    title: "Forecast",
+    description:
+      "Proyecta ingresos y demanda con múltiples métodos de pronóstico. Compara escenarios y alinea proyecciones con tu estrategia.",
+  },
+  {
+    slug: "estrategia-bsc",
+    icon: Target,
+    title: "Estrategia BSC",
+    description:
+      "Mapas estratégicos, KPIs jerárquicos y alertas automatizadas para alinear la ejecución operativa con la visión organizacional.",
   },
   {
     slug: "seguridad-multi-tenant",
     icon: Shield,
     title: "Seguridad Multi-Tenant",
     description:
-      "Aislamiento celular por empresa con roles granulares y Row-Level Security.",
-  },
-  {
-    slug: "tiempo-real",
-    icon: Zap,
-    title: "Tiempo Real",
-    description:
-      "Dashboards con gauges, tendencias y mapas estratégicos que se actualizan al instante.",
-  },
-  {
-    slug: "multi-empresa",
-    icon: Users,
-    title: "Multi-Empresa",
-    description:
-      "Gestiona múltiples clientes desde una sola cuenta. Ideal para consultores financieros.",
-  },
-  {
-    slug: "cloud",
-    icon: Globe,
-    title: "100% Cloud",
-    description:
-      "Sin instalación. Accede desde cualquier dispositivo con seguridad enterprise.",
+      "Aislamiento celular por empresa con roles granulares, Row-Level Security y arquitectura cloud enterprise.",
   },
 ];
 
@@ -87,65 +90,65 @@ const steps = [
   {
     icon: Upload,
     step: "1",
-    title: "Importa tus datos",
+    title: "Conecta tus datos",
     description:
-      "Sube tu catálogo contable desde Excel. El sistema valida la integridad y crea automáticamente tus diccionarios de Recursos, Actividades y Objetos de Costo.",
+      "Importa desde Excel o conecta tu ERP. El sistema valida la integridad, detecta inconsistencias y estructura tus datos automáticamente.",
   },
   {
     icon: Settings2,
     step: "2",
-    title: "Configura tu modelo",
+    title: "Elige tu herramienta",
     description:
-      "Define los drivers de asignación (Uniformes o Extendidos) y establece las relaciones entre recursos, actividades y objetos de costo.",
+      "Activa los módulos que necesitas: Costeo ABC, BI Express, Logística, Forecast o BSC. Cada uno se configura de forma independiente.",
   },
   {
     icon: LineChart,
     step: "3",
-    title: "Visualiza resultados",
+    title: "Analiza en tiempo real",
     description:
-      "Accede a dashboards en tiempo real con gauges, mapas estratégicos y reportes de rentabilidad por producto, cliente o servicio.",
+      "Dashboards, mapas estratégicos, pronósticos y análisis de sensibilidad se actualizan instantáneamente con tus datos más recientes.",
   },
   {
     icon: Target,
     step: "4",
-    title: "Toma decisiones",
+    title: "Decide con confianza",
     description:
-      "Identifica qué clientes o productos erosionan tu margen, establece KPIs con alertas automáticas y alinea tu operación con tu estrategia.",
+      "Precios, estrategia, logística, presupuesto — toma cada decisión respaldada por modelos cuantitativos, no por intuición.",
   },
 ];
 
 const personas = [
   {
     icon: Briefcase,
-    title: "Dueño de PyME",
+    title: "Ejecutivo / Director",
     description:
-      "Reemplaza tus hojas de cálculo por un sistema que te muestra exactamente cuánto cuesta cada producto y cliente. Toma decisiones de precio basadas en datos, no en intuición.",
+      "Toma decisiones estratégicas con visibilidad completa: rentabilidad, KPIs, forecast y logística en un solo lugar. Sin esperar reportes manuales.",
     benefits: [
-      "Rentabilidad real por producto",
-      "Decisiones de precio informadas",
-      "Reportes para inversionistas",
-    ],
-  },
-  {
-    icon: GraduationCap,
-    title: "Consultor Financiero",
-    description:
-      "Gestiona múltiples clientes desde una cuenta. Implementa modelos ABC en días, no meses. Ofrece valor diferenciado con reportes profesionales automatizados.",
-    benefits: [
-      "Multi-empresa desde $40/cliente/mes",
-      "Plantillas ABC pre-configuradas",
-      "Reportes con tu marca",
+      "Dashboards ejecutivos en tiempo real",
+      "BSC con mapas estratégicos visuales",
+      "Alertas proactivas antes de que escalen",
     ],
   },
   {
     icon: FileSpreadsheet,
     title: "Analista / Controller",
     description:
-      "Deja de perseguir datos en hojas de cálculo. Obtén cierres de período precisos con trazabilidad completa y cero errores de redondeo.",
+      "Deja de perseguir datos en hojas de cálculo. Modelos de costos, pronósticos y análisis de sensibilidad con trazabilidad completa y cero errores.",
     benefits: [
-      "Trazabilidad Recurso → Objeto",
-      "Cero errores de redondeo",
-      "Alertas automáticas de desvío",
+      "Trazabilidad Recurso → Objeto de Costo",
+      "Forecast con múltiples métodos",
+      "Análisis What-If y sensibilidad",
+    ],
+  },
+  {
+    icon: GraduationCap,
+    title: "Dueño de Negocio / Consultor",
+    description:
+      "Gestiona múltiples empresas desde una cuenta. Implementa modelos en días y ofrece reportes profesionales que justifican tus honorarios.",
+    benefits: [
+      "Multi-empresa desde $40/cliente/mes",
+      "Suite completa de 5 herramientas",
+      "Onboarding automatizado en minutos",
     ],
   },
 ];
@@ -158,7 +161,7 @@ const plans = [
     period: "/mes",
     annualNote: "o $39/mes facturado anualmente",
     description:
-      "Reemplaza tus hojas de cálculo por un sistema ABC/BSC en la nube.",
+      "Accede a las 5 herramientas analíticas de The Black Box en la nube.",
     features: [
       "1 Empresa (Tenant)",
       "Hasta 3 usuarios",
@@ -635,15 +638,15 @@ export default function LandingPage() {
                 14 días de prueba gratuita &mdash; Sin tarjeta de crédito
               </Badge>
               <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
-                Domina tus costos.
+                La plataforma para
                 <br />
-                <span className="text-primary">Impulsa tu estrategia.</span>
+                <span className="text-primary">quienes deciden.</span>
               </h1>
               <p className="mt-6 max-w-2xl text-lg text-muted-foreground">
-                La plataforma cloud que combina Costeo Basado en Actividades
-                (ABC) y Balanced Scorecard (BSC) para que PyMEs y consultores
-                tomen decisiones financieras basadas en datos reales, no en
-                intuición.
+                Suite integrada de herramientas analíticas como Costeo ABC,
+                BI Express, Eficiencia Logística, Forecast, Estrategia BSC —
+                diseñada para que ejecutivos, analistas y dueños de negocio
+                tomen decisiones basadas en datos reales, no en intuición.
               </p>
               <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start">
                 <Button size="lg" className="gap-2 px-8" asChild>
@@ -707,7 +710,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-6xl px-6 mb-10 text-center">
           <h2 className="text-3xl font-bold">Lo que dicen nuestros usuarios</h2>
           <p className="mt-3 text-muted-foreground">
-            Más de 200 empresas ya transformaron su gestión de costos con
+            Más de 200 empresas ya transformaron su toma de decisiones con
             The Black Box.
           </p>
         </div>
@@ -816,9 +819,12 @@ export default function LandingPage() {
       >
         <div className="mx-auto max-w-6xl">
           <div className="mb-14 text-center">
+            <p className="mb-3 text-4xl font-bold text-primary">
+              Sé calculador y toma la mejor decisión
+            </p>
             <h2 className="text-3xl font-bold">Cómo funciona</h2>
             <p className="mt-3 text-muted-foreground">
-              De la hoja de cálculo a decisiones estratégicas en 4 pasos.
+              De tus datos a decisiones estratégicas en 4 pasos.
             </p>
           </div>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -827,7 +833,7 @@ export default function LandingPage() {
                 <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
                   <s.icon className="h-6 w-6 text-primary" />
                 </div>
-                <div className="absolute -top-1 left-1/2 -translate-x-1/2 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">
                   {s.step}
                 </div>
                 <h3 className="mb-2 font-semibold">{s.title}</h3>
@@ -852,26 +858,26 @@ export default function LandingPage() {
             </div>
             <div>
               <h2 className="text-3xl font-bold mb-4">
-                De gastos desordenados a{" "}
-                <span className="text-primary">rentabilidad clara</span>
+                De datos dispersos a{" "}
+                <span className="text-primary">decisiones claras</span>
               </h2>
               <p className="text-muted-foreground leading-relaxed mb-6">
-                The Black Box transforma tus datos contables — salarios, servicios,
-                depreciación — en información accionable sobre la rentabilidad
-                real de cada producto, cliente y canal. Todo desde una
-                plataforma intuitiva que reemplaza tus hojas de cálculo.
+                The Black Box centraliza tus datos financieros, operativos y
+                estratégicos en una sola plataforma. Cada módulo resuelve un
+                problema de negocio concreto: saber qué cuesta, qué rinde,
+                qué se proyecta y hacia dónde va la organización.
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div className="rounded-lg bg-background/80 border border-border/50 p-4">
-                  <p className="text-2xl font-bold text-primary">80%</p>
+                  <p className="text-2xl font-bold text-primary">5</p>
                   <p className="text-xs text-muted-foreground">
-                    Reducción en tiempo de cierre
+                    Herramientas analíticas integradas
                   </p>
                 </div>
                 <div className="rounded-lg bg-background/80 border border-border/50 p-4">
-                  <p className="text-2xl font-bold text-primary">100%</p>
+                  <p className="text-2xl font-bold text-primary">80%</p>
                   <p className="text-xs text-muted-foreground">
-                    Trazabilidad de costos
+                    Menos tiempo en análisis manuales
                   </p>
                 </div>
               </div>
@@ -898,7 +904,7 @@ export default function LandingPage() {
           <div className="mb-14 text-center">
             <h2 className="text-3xl font-bold">¿Para quién es The Black Box?</h2>
             <p className="mt-3 text-muted-foreground">
-              Diseñado para quienes necesitan respuestas financieras precisas.
+              Diseñado para quienes toman decisiones y necesitan datos, no suposiciones.
             </p>
             <img
               src="/images/businessman-abc.png"
@@ -937,11 +943,11 @@ export default function LandingPage() {
         <div className="mx-auto max-w-6xl">
           <div className="mb-14 text-center">
             <h2 className="text-3xl font-bold">
-              Todo lo que necesitas para gestionar costos y estrategia
+              5 herramientas. Una plataforma. Todas tus decisiones.
             </h2>
             <p className="mt-3 text-muted-foreground">
-              Basado en la metodología Sixtina, respaldada por más de 20 años de
-              implementaciones en Latinoamérica.
+              Cada módulo aborda un problema de negocio distinto. Úsalos de
+              forma independiente o combinados para una visión 360° de tu operación.
             </p>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

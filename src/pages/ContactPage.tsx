@@ -42,9 +42,12 @@ export default function ContactPage() {
       {/* Navbar */}
       <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link to="/" className="flex items-center gap-2">
-            <img src="/images/logo-tbb.png" alt="The Black Box" className="h-8" />
-            <span className="text-lg font-bold">The Black Box</span>
+          <Link to="/">
+            <img
+              src={theme === "dark" ? "/images/logo-white.png" : "/images/logo-bb.png"}
+              alt="The Black Box"
+              className="h-12"
+            />
           </Link>
           <div className="flex items-center gap-2">
             <Button
@@ -59,7 +62,7 @@ export default function ContactPage() {
                 <Moon className="h-4 w-4" />
               )}
             </Button>
-            <Button asChild>
+            <Button asChild size="sm">
               <Link to="/login">Ingresar</Link>
             </Button>
           </div>
@@ -194,8 +197,11 @@ export default function ContactPage() {
       <footer className="border-t border-border/50 px-6 py-8 mt-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 text-xs text-muted-foreground sm:flex-row">
           <div className="flex items-center gap-2">
-            <img src="/images/logo-tbb.png" alt="The Black Box" className="h-6" />
-            <span>The Black Box Cloud Platform</span>
+            <img
+              src={theme === "dark" ? "/images/logo-white.png" : "/images/logo-bb.png"}
+              alt="The Black Box"
+              className="h-7"
+            />
           </div>
           <p>&copy; 2026 The Black Box. Todos los derechos reservados.</p>
         </div>

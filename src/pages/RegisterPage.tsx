@@ -110,9 +110,12 @@ export default function RegisterPage() {
       {/* Right side - Register form */}
       <div className="flex w-full flex-col lg:w-1/2">
         <div className="flex items-center justify-between px-6 py-4">
-          <Link to="/" className="flex items-center gap-2 lg:invisible">
-            <img src="/images/logo-tbb.png" alt="The Black Box" className="h-8" />
-            <span className="text-lg font-bold">The Black Box</span>
+          <Link to="/" className="lg:invisible">
+            <img
+              src={theme === "dark" ? "/images/logo-white.png" : "/images/logo-bb.png"}
+              alt="The Black Box"
+              className="h-12"
+            />
           </Link>
           <Button variant="ghost" size="icon" onClick={toggleTheme}>
             {theme === "dark" ? (

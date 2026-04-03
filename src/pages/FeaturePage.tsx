@@ -9,12 +9,12 @@ import {
   BarChart3,
   Target,
   Shield,
-  Zap,
-  Users,
-  Globe,
   Moon,
   Sun,
   CheckCircle2,
+  PieChart,
+  Truck,
+  TrendingUp,
   type LucideIcon,
 } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
@@ -33,11 +33,11 @@ interface FeatureDetail {
 
 const featureImages: Record<string, string> = {
   "costeo-abc": "/images/rentabilidad-tablet.png",
-  "balanced-scorecard": "/images/rentabilidad-flow.png",
+  "bi-express": "/images/rentabilidad-flow.png",
+  "logistica": "/images/driver-relationships.png",
+  "forecast": "/images/rentabilidad-flow.png",
+  "estrategia-bsc": "/images/rentabilidad-flow.png",
   "seguridad-multi-tenant": "/images/hero-abc-costing.png",
-  "tiempo-real": "/images/rentabilidad-flow.png",
-  "multi-empresa": "/images/driver-relationships.png",
-  cloud: "/images/hero-abc-costing.png",
 };
 
 const featureData: Record<string, FeatureDetail> = {
@@ -76,10 +76,115 @@ const featureData: Record<string, FeatureDetail> = {
     ],
     cta: "Descubre cuánto te cuesta realmente cada cliente",
   },
-  "balanced-scorecard": {
-    slug: "balanced-scorecard",
+  "bi-express": {
+    slug: "bi-express",
+    icon: PieChart,
+    title: "BI Express",
+    tagline: "Inteligencia de negocio lista en minutos, no en meses.",
+    description:
+      "BI Express democratiza el análisis de datos para cualquier área de la organización. Sin depender del área de TI, cualquier analista puede crear dashboards con KPIs personalizados a partir de un catálogo de indicadores preconstruidos. Conecta datos, selecciona métricas y publica tu dashboard en minutos.",
+    benefits: [
+      {
+        title: "Catálogo de KPIs",
+        text: "Selecciona indicadores de un catálogo curado por industria: financieros, operativos, comerciales y de RRHH. Cada KPI incluye fórmula, frecuencia de actualización y benchmarks de referencia para que sepas si tu desempeño es competitivo.",
+      },
+      {
+        title: "Dashboards Personalizados",
+        text: "Arrastra y suelta indicadores en un canvas visual. Configura rangos semafóricos, objetivos y umbrales de alerta por KPI. El resultado es un panel de control ejecutivo que refleja exactamente las prioridades de tu negocio.",
+      },
+      {
+        title: "Análisis de Tendencias",
+        text: "Visualiza la evolución de cada indicador en el tiempo. Identifica patrones estacionales, ciclos de desempeño y desviaciones respecto a objetivos históricos. Los gráficos de tendencia se generan automáticamente con cada actualización de datos.",
+      },
+      {
+        title: "Alertas Inteligentes",
+        text: "Define umbrales por KPI y recibe alertas proactivas cuando un indicador entra en zona de riesgo. Las alertas se configuran por prioridad (Baja, Moderada, Alta) y pueden asignarse a destinatarios específicos dentro de la organización.",
+      },
+    ],
+    highlights: [
+      "Catálogo de KPIs por industria con benchmarks de referencia",
+      "Dashboards configurables por área sin necesidad de TI",
+      "Sistema semafórico: verde (cumple), amarillo (riesgo), rojo (crítico)",
+      "Análisis de tendencias con períodos históricos comparables",
+      "Alertas proactivas con prioridad y destinatarios configurables",
+      "Integración nativa con datos del módulo Costeo ABC",
+    ],
+    cta: "Crea tu primer dashboard en menos de 10 minutos",
+  },
+  "logistica": {
+    slug: "logistica",
+    icon: Truck,
+    title: "Eficiencia Logística",
+    tagline: "Optimiza costos de distribución con modelos cuantitativos.",
+    description:
+      "El módulo de Eficiencia Logística aplica modelos de costos especializados para operaciones de distribución, transporte y cadena de suministro. Identifica ineficiencias por ruta, canal y cliente, y simula el impacto de cambios operativos antes de implementarlos — con análisis What-If y sensibilidad de parámetros.",
+    benefits: [
+      {
+        title: "Modelos de Costo Logístico",
+        text: "Construye modelos específicos para tu operación: costo por kilómetro, por entrega, por cliente o por zona. El sistema segrega costos fijos y variables, permitiendo identificar cuál es el punto de equilibrio de cada ruta o canal de distribución.",
+      },
+      {
+        title: "Análisis What-If",
+        text: "Simula escenarios antes de decidir: ¿qué pasa si elimino esta ruta? ¿si tercerizo el último tramo? ¿si cambio la frecuencia de entrega? El módulo calcula el impacto en costos y rentabilidad de cada alternativa en segundos.",
+      },
+      {
+        title: "Análisis de Sensibilidad",
+        text: "Identifica qué variables de tu modelo tienen mayor impacto en el costo final. El análisis de sensibilidad muestra cómo cambia el resultado ante variaciones en combustible, tarifas de flete, volumen o densidad de la ruta.",
+      },
+      {
+        title: "Resultados Desagregados",
+        text: "Visualiza costos desagregados por ruta, canal, cliente, zona geográfica y tipo de producto. Identifica qué segmentos son rentables y cuáles están subsidiando operaciones deficitarias.",
+      },
+    ],
+    highlights: [
+      "Modelos de costo por ruta, canal, cliente y zona geográfica",
+      "Análisis What-If con múltiples escenarios simultáneos",
+      "Sensibilidad de parámetros para decisiones de pricing logístico",
+      "Segregación automática de costos fijos y variables",
+      "Comparación de períodos para identificar tendencias de eficiencia",
+      "Exportación de resultados para negociación con transportistas",
+    ],
+    cta: "Descubre cuánto cuesta realmente cada entrega",
+  },
+  "forecast": {
+    slug: "forecast",
+    icon: TrendingUp,
+    title: "Forecast",
+    tagline: "Proyecta el futuro con modelos, no con intuición.",
+    description:
+      "El módulo de Forecast aplica métodos cuantitativos de pronóstico para proyectar ingresos, demanda y costos. Combina series de tiempo históricas con variables de negocio para generar proyecciones ajustadas al contexto real de tu empresa — no fórmulas genéricas de Excel.",
+    benefits: [
+      {
+        title: "Múltiples Métodos de Pronóstico",
+        text: "Selecciona el método más adecuado para tu tipo de dato: promedio móvil, suavizamiento exponencial, regresión lineal o estacionalidad Holt-Winters. El sistema sugiere el mejor método basado en el patrón histórico de tus datos.",
+      },
+      {
+        title: "Comparación de Escenarios",
+        text: "Define escenarios optimista, base y pesimista para cada proyección. Compara visualmente cómo cambian los resultados según los supuestos de cada escenario y comunica el rango de incertidumbre a la dirección.",
+      },
+      {
+        title: "Dashboard de Proyecciones",
+        text: "Visualiza tus proyecciones vs. resultados reales en tiempo real. El dashboard muestra el avance del período actual, la desviación respecto al forecast y las alertas cuando el negocio se aleja significativamente de lo proyectado.",
+      },
+      {
+        title: "Alineación con Estrategia",
+        text: "Conecta las proyecciones del Forecast con los objetivos del módulo BSC. Cuando el forecast detecta un desvío respecto a los KPIs estratégicos, el equipo directivo recibe contexto cuantitativo para ajustar el plan.",
+      },
+    ],
+    highlights: [
+      "Métodos: promedio móvil, suavizamiento exponencial, Holt-Winters",
+      "Escenarios optimista / base / pesimista con intervalos de confianza",
+      "Dashboard de seguimiento forecast vs. real por período",
+      "Alertas de desvío significativo respecto a proyecciones",
+      "Integración con datos históricos de Costeo ABC",
+      "Exportación de proyecciones para presupuestación y reporting",
+    ],
+    cta: "Planifica con proyecciones que reflejan la realidad",
+  },
+  "estrategia-bsc": {
+    slug: "estrategia-bsc",
     icon: Target,
-    title: "Balanced Scorecard",
+    title: "Estrategia BSC",
     tagline: "Alinea la ejecución operativa con tu visión estratégica.",
     description:
       "El módulo BSC transforma tu estrategia en un sistema de gestión medible. Integra indicadores de gestión (KPIs) directamente con los resultados del motor ABC, creando un ciclo de retroalimentación en tiempo real entre lo que planificas y lo que realmente sucede. No es un póster decorativo — es un instrumento de mando.",
@@ -146,111 +251,6 @@ const featureData: Record<string, FeatureDetail> = {
     ],
     cta: "Protege los datos de tus clientes sin esfuerzo",
   },
-  "tiempo-real": {
-    slug: "tiempo-real",
-    icon: Zap,
-    title: "Tiempo Real",
-    tagline: "Dashboards que reflejan la realidad, no el pasado.",
-    description:
-      "Los dashboards de The Black Box no son reportes estáticos — son instrumentos de vuelo que se actualizan al instante. Gauges SVG, gráficos de tendencia y mapas estratégicos alimentados por datos en tiempo real te permiten tomar decisiones antes de que los problemas escalen.",
-    benefits: [
-      {
-        title: "Gauges de Rendimiento",
-        text: "Indicadores tipo velocímetro que muestran el estado de cada KPI con zonas semafóricas (rojo/amarillo/verde). De un vistazo sabes si estás en zona de peligro, precaución o cumplimiento. Ideales para monitorear antes de que se agoten los recursos.",
-      },
-      {
-        title: "Gráficos de Tendencia",
-        text: "Visualiza la evolución de costos vs objetivos mes a mes. Los gráficos de barras comparan el desempeño real contra las metas, permitiendo identificar desviaciones antes del cierre fiscal y tomar acciones correctivas a tiempo.",
-      },
-      {
-        title: "Mapa Estratégico Visual",
-        text: "Las 4 perspectivas del BSC se muestran como tarjetas interactivas con los KPIs de cada una. Los colores semafóricos permiten una lectura instantánea de la salud estratégica de toda la organización.",
-      },
-      {
-        title: "Visualización Inteligente",
-        text: "Siguiendo las mejores prácticas: barras para comparar tendencias (<10 puntos), heatmaps para dimensiones complejas con códigos semafóricos, y gráficos de burbujas para analizar frecuencias e intensidades.",
-      },
-    ],
-    highlights: [
-      "Gauges SVG con zonas semafóricas configurables",
-      "Gráficos de barras: Real vs Objetivo por período",
-      "Mapas estratégicos con 4 perspectivas del BSC",
-      "Latencia intra-celular monitorada < 50ms",
-      "Actualización automática sin intervención manual",
-      "Pipelines ETL para eliminar error humano en datos",
-    ],
-    cta: "Toma decisiones con datos de hoy, no de ayer",
-  },
-  "multi-empresa": {
-    slug: "multi-empresa",
-    icon: Users,
-    title: "Multi-Empresa",
-    tagline: "Una cuenta, múltiples clientes. El sueño del consultor.",
-    description:
-      "Diseñado para consultores financieros que gestionan la contabilidad de varios clientes simultáneamente. Desde una sola cuenta puedes administrar hasta 5 empresas independientes (o ilimitadas en Enterprise), cada una con sus propios modelos de costos, KPIs y usuarios — todo con aislamiento total de datos.",
-    benefits: [
-      {
-        title: "Gestión Centralizada",
-        text: "Panel único para administrar todos tus clientes. Cambia entre empresas con un clic sin cerrar sesión. Cada tenant tiene su propio espacio de datos completamente aislado, pero tú los supervisas todos desde un solo lugar.",
-      },
-      {
-        title: "ROI para Consultores",
-        text: "Absorbe el costo del software y cóbralo como parte de tu consultoría. Con el plan Pro a $199/mes gestionando 5 empresas, el costo por cliente es de ~$40/mes — una fracción de lo que cobras por tu servicio profesional.",
-      },
-      {
-        title: "Onboarding Automatizado",
-        text: "Dar de alta un nuevo cliente es inmediato. El sistema aprovisiona automáticamente su célula, configura el aislamiento de datos y crea los usuarios iniciales. Importa su catálogo contable desde Excel y está listo para trabajar.",
-      },
-      {
-        title: "Reportes Comparativos",
-        text: "Como consultor, puedes comparar el desempeño entre tus clientes (respetando la confidencialidad de cada uno). Identifica patrones, mejores prácticas y oportunidades de mejora que puedes ofrecer como valor agregado.",
-      },
-    ],
-    highlights: [
-      "Hasta 5 tenants en plan Pro, ilimitados en Enterprise",
-      "Aislamiento total de datos entre empresas",
-      "Cambio de contexto instantáneo entre clientes",
-      "Onboarding automatizado con aprovisionamiento de celda",
-      "Usuarios independientes por empresa",
-      "Costo por cliente: ~$40/mes en plan Pro",
-    ],
-    cta: "Escala tu consultoría con tecnología",
-  },
-  cloud: {
-    slug: "cloud",
-    icon: Globe,
-    title: "100% Cloud",
-    tagline: "Sin servidores. Sin instalación. Sin límites.",
-    description:
-      "The Black Box corre completamente en la nube sobre una arquitectura AWS optimizada para rendimiento y escalabilidad. No necesitas instalar nada — accede desde cualquier navegador y dispositivo con la misma seguridad que un sistema enterprise on-premise, pero sin la complejidad de mantenerlo.",
-    benefits: [
-      {
-        title: "Cero Instalación",
-        text: "Abre tu navegador, inicia sesión y trabaja. Sin descargas, sin configuraciones de servidor, sin dependencias de sistema operativo. Funciona en Windows, Mac, Linux, tablets y móviles.",
-      },
-      {
-        title: "Escalabilidad Automática",
-        text: "La arquitectura híbrida escala verticalmente para ingesta masiva de transacciones y horizontalmente para cálculos intensivos de CPU. Las micro-células escalan de forma independiente según la demanda de cada inquilino.",
-      },
-      {
-        title: "Disponibilidad 99.9%",
-        text: "SLA garantizado con monitoreo de uptime en el Control Plane. La arquitectura celular asegura que un fallo en una célula no afecta a las demás — el blast radius se contiene automáticamente.",
-      },
-      {
-        title: "Backups y Recuperación",
-        text: "Tus datos están protegidos con backups automáticos y políticas de retención configurables. La recuperación ante desastres está integrada en la arquitectura, no es un complemento adicional.",
-      },
-    ],
-    highlights: [
-      "Arquitectura AWS con células de despliegue independientes",
-      "Escalado vertical para IO-intensive, horizontal para CPU-intensive",
-      "SLA de disponibilidad 99.9% por célula",
-      "Acceso desde cualquier navegador y dispositivo",
-      "Backups automáticos con retención configurable",
-      "Actualizaciones continuas sin downtime",
-    ],
-    cta: "Empieza en minutos, no en meses",
-  },
 };
 
 export default function FeaturePage() {
@@ -282,9 +282,12 @@ export default function FeaturePage() {
       {/* Navbar */}
       <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link to="/" className="flex items-center gap-2">
-            <img src="/images/logo-tbb.png" alt="The Black Box" className="h-8" />
-            <span className="text-lg font-bold">The Black Box</span>
+          <Link to="/">
+            <img
+              src={theme === "dark" ? "/images/logo-white.png" : "/images/logo-bb.png"}
+              alt="The Black Box"
+              className="h-12"
+            />
           </Link>
           <div className="flex items-center gap-2">
             <Button
@@ -302,7 +305,7 @@ export default function FeaturePage() {
             <Button variant="ghost" asChild>
               <Link to="/#features">Funcionalidades</Link>
             </Button>
-            <Button asChild>
+            <Button asChild size="sm">
               <Link to="/login">Ingresar</Link>
             </Button>
           </div>
@@ -444,8 +447,11 @@ export default function FeaturePage() {
       <footer className="border-t border-border/50 px-6 py-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 text-xs text-muted-foreground sm:flex-row">
           <div className="flex items-center gap-2">
-            <img src="/images/logo-tbb.png" alt="The Black Box" className="h-6" />
-            <span>The Black Box Cloud Platform</span>
+            <img
+              src={theme === "dark" ? "/images/logo-white.png" : "/images/logo-bb.png"}
+              alt="The Black Box"
+              className="h-7"
+            />
           </div>
           <p>&copy; 2026 The Black Box. Todos los derechos reservados.</p>
         </div>
