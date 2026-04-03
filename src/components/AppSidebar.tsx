@@ -5,12 +5,38 @@ import {
   ArrowRightLeft,
   Target,
   BarChart3,
-  Settings,
+  PieChart,
+  GitBranch,
+  ShieldCheck,
+  Building2,
+  Zap,
+  CalendarRange,
+  Box,
+  FlaskConical,
+  FileSpreadsheet,
   Moon,
   Sun,
+  LogOut,
+  Database,
+  ArrowLeft,
+  TrendingUp,
+  Upload,
+  Truck,
+  LineChart,
+  Settings2,
+  AlertTriangle,
+  Layers,
+  TableProperties,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useModelContext } from "@/contexts/ModelContext";
+import { useBIExpressContext } from "@/contexts/BIExpressContext";
+import { TEMPLATE_CATALOG } from "@/lib/bi-express-engine";
+import { useLogisticsContext } from "@/contexts/LogisticsContext";
+import { useForecastContext } from "@/contexts/ForecastContext";
+import { useTenant } from "@/hooks/use-tenant";
 import {
   Sidebar,
   SidebarContent,
@@ -28,13 +54,12 @@ import { useTheme } from "@/hooks/use-theme";
 import { Button } from "@/components/ui/button";
 
 const mainNav = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "Administración", url: "/admin", icon: Users },
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
 ];
 
-const abcNav = [
-  { title: "Diccionarios", url: "/dictionaries", icon: BookOpen },
-  { title: "Asignaciones", url: "/assignments", icon: ArrowRightLeft },
+const adminNav = [
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Administración", url: "/admin", icon: Users },
 ];
 
 const bscNav = [
@@ -42,7 +67,15 @@ const bscNav = [
   { title: "Analítica", url: "/analytics", icon: BarChart3 },
 ];
 
-function NavSection({ label, items, collapsed }: { label: string; items: typeof mainNav; collapsed: boolean }) {
+function NavSection({
+  label,
+  items,
+  collapsed,
+}: {
+  label: string;
+  items: typeof mainNav;
+  collapsed: boolean;
+}) {
   return (
     <SidebarGroup>
       <SidebarGroupLabel>{label}</SidebarGroupLabel>
@@ -53,7 +86,7 @@ function NavSection({ label, items, collapsed }: { label: string; items: typeof 
               <SidebarMenuButton asChild>
                 <NavLink
                   to={item.url}
-                  end={item.url === "/"}
+                  end={item.url === "/dashboard"}
                   className="hover:bg-accent/50"
                   activeClassName="bg-primary/10 text-primary font-medium"
                 >
@@ -73,38 +106,196 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const { theme, toggleTheme } = useTheme();
+  const { signOut, user } = useAuth();
+  const { tenant, userRole } = useTenant();
+  const { selectedModel, selectedPeriod, setSelectedModel, setSelectedPeriod } =
+    useModelContext();
+  const { selectedBIModel, selectedBIPeriod, setSelectedBIModel, setSelectedBIPeriod, loadedTemplates } =
+    useBIExpressContext();
+  const { selectedLogisticsModel, selectedLogisticsPeriod, setSelectedLogisticsModel, setSelectedLogisticsPeriod } =
+    useLogisticsContext();
+  const { selectedForecastModel, selectedForecastPeriod, setSelectedForecastModel, setSelectedForecastPeriod } =
+    useForecastContext();
+  const navigate = useNavigate();
+
+  const isInABC = !!(selectedModel && selectedPeriod);
+  const isInBI = !!(selectedBIModel && selectedBIPeriod);
+  const isInLogistics = !!(selectedLogisticsModel && selectedLogisticsPeriod);
+  const isInForecast = !!(selectedForecastModel && selectedForecastPeriod);
+  const isInModule = isInABC || isInBI || isInLogistics || isInForecast;
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
+
+  const handleBackToModels = () => {
+    setSelectedModel(null);
+    setSelectedPeriod(null);
+    navigate("/models");
+  };
+
+  const handleBackToBIModels = () => {
+    setSelectedBIModel(null);
+    setSelectedBIPeriod(null);
+    navigate("/bi-express");
+  };
+
+  const handleBackToLogisticsModels = () => {
+    setSelectedLogisticsModel(null);
+    setSelectedLogisticsPeriod(null);
+    navigate("/logistics");
+  };
+
+  const handleBackToForecastModels = () => {
+    setSelectedForecastModel(null);
+    setSelectedForecastPeriod(null);
+    navigate("/forecast");
+  };
+
+  const toolsNav = isInABC
+    ? [
+        { title: "Diccionarios", url: "/dictionaries", icon: BookOpen },
+        { title: "Dimensiones", url: "/dimensions", icon: Layers },
+        { title: "Asignaciones", url: "/assignments", icon: ArrowRightLeft },
+      ]
+    : isInBI
+    ? [
+        { title: "Plantillas", url: "/bi-express/catalog", icon: Upload },
+        { title: "Selector KPIs", url: "/bi-express/kpi-selector", icon: Settings2 },
+        { title: "Análisis", url: "/bi-express/dashboard", icon: BarChart3 },
+        ...Array.from(loadedTemplates).map((id) => ({
+          title: `${id} · ${TEMPLATE_CATALOG[id].name}`,
+          url: `/bi-express/data/${id}`,
+          icon: Database,
+        })),
+      ]
+    : isInLogistics
+    ? [
+        { title: "Datos de Entrada", url: "/logistics/inputs", icon: Settings2 },
+        { title: "Resultados", url: "/logistics/results", icon: Target },
+        { title: "What-If", url: "/logistics/whatif", icon: AlertTriangle },
+        { title: "Sensibilidad", url: "/logistics/sensitivity", icon: BarChart3 },
+      ]
+    : isInForecast
+    ? [
+        { title: "Datos de Entrada", url: "/forecast/data", icon: Database },
+        { title: "Resultados", url: "/forecast/results", icon: LineChart },
+      ]
+    : [
+        { title: "Costeo ABC", url: "/models", icon: Database },
+        { title: "BI Express", url: "/bi-express", icon: TrendingUp },
+        { title: "Eficiencia logística", url: "/logistics", icon: Truck },
+        { title: "Forecast", url: "/forecast", icon: LineChart },
+      ];
+
+  const reportsNav = [
+    { title: "Distribución de costos", url: "/reports", icon: PieChart },
+    { title: "Rentabilidad", url: "/profitability", icon: BarChart3 },
+    { title: "Sensibilidad", url: "/sensitivity", icon: FlaskConical },
+    { title: "Resumen ejecutivo", url: "/executive-summary", icon: FileSpreadsheet },
+    { title: "Análisis Cruzado", url: "/cross-analysis", icon: TableProperties },
+    { title: "Validación del modelo", url: "/model-health", icon: ShieldCheck },
+    { title: "Comparativo períodos", url: "/period-comparison", icon: CalendarRange },
+  ];
+
+  // Determine which active model to show in header
+  const activeModel = isInABC ? selectedModel : isInBI ? selectedBIModel : isInLogistics ? selectedLogisticsModel : isInForecast ? selectedForecastModel : null;
+  const activePeriod = isInABC ? selectedPeriod : isInBI ? selectedBIPeriod : isInLogistics ? selectedLogisticsPeriod : isInForecast ? selectedForecastPeriod : null;
+  const handleBack = isInABC ? handleBackToModels : isInBI ? handleBackToBIModels : isInLogistics ? handleBackToLogisticsModels : handleBackToForecastModels;
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="p-4">
-        <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-sm">A</span>
-          </div>
-          {!collapsed && (
-            <div>
-              <h2 className="text-sm font-bold text-foreground">ABCCosting</h2>
-              <p className="text-[10px] text-muted-foreground">Cloud Platform</p>
-            </div>
-          )}
+      <SidebarHeader className="p-4 flex flex-col gap-4">
+        <div className="relative flex h-10 w-full items-center">
+          <img
+            src="/images/logo-bb.png"
+            alt="The Black Box"
+            className={`absolute left-0 h-10 w-auto transition-all duration-300 ease-in-out origin-left dark:hidden ${
+              collapsed ? "opacity-0 scale-90 invisible" : "opacity-100 scale-100 visible delay-100"
+            }`}
+          />
+          <img
+            src="/images/logo-white.png"
+            alt="The Black Box"
+            className={`absolute left-0 h-10 w-auto transition-all duration-300 ease-in-out origin-left hidden dark:block ${
+              collapsed ? "opacity-0 scale-90 invisible" : "opacity-100 scale-100 visible delay-100"
+            }`}
+          />
+          <img
+            src="/images/logo-icon.png"
+            alt="TBB"
+            className={`absolute left-0 top-1 h-8 w-8 object-contain transition-all duration-300 ease-in-out origin-left ${
+              collapsed ? "opacity-100 scale-100 visible delay-100" : "opacity-0 scale-90 invisible"
+            }`}
+          />
         </div>
+        {!collapsed && activeModel && activePeriod && (
+          <div className="bg-muted/50 p-3 rounded-md border border-border/50 flex items-center gap-3 group">
+            <button
+              onClick={handleBack}
+              className="p-1.5 rounded-md hover:bg-background/80 text-muted-foreground hover:text-foreground transition-colors shrink-0 bg-background/50"
+              title="Volver a seleccionar modelo"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </button>
+            <div className="flex flex-col gap-0.5 overflow-hidden">
+              <span className="text-xs font-semibold text-primary line-clamp-1">
+                {activeModel.name}
+              </span>
+              <span className="text-[10px] text-muted-foreground line-clamp-1">
+                Período: {activePeriod.name}
+              </span>
+            </div>
+          </div>
+        )}
       </SidebarHeader>
 
       <SidebarContent>
-        <NavSection label="General" items={mainNav} collapsed={collapsed} />
-        <NavSection label="Costeo ABC" items={abcNav} collapsed={collapsed} />
-        <NavSection label="BSC" items={bscNav} collapsed={collapsed} />
+        {!isInModule && (
+          <NavSection label="General" items={userRole === "admin" ? adminNav : mainNav} collapsed={collapsed} />
+        )}
+        <NavSection
+          label={isInABC ? "Costeo ABC" : isInBI ? "BI Express" : isInLogistics ? "Eficiencia Logística" : isInForecast ? "Forecast" : "Herramientas de análisis"}
+          items={toolsNav}
+          collapsed={collapsed}
+        />
+        {isInABC && (
+          <NavSection label="Reportes" items={reportsNav} collapsed={collapsed} />
+        )}
+        {!isInModule && (
+          <NavSection label="BSC" items={bscNav} collapsed={collapsed} />
+        )}
       </SidebarContent>
 
-      <SidebarFooter className="p-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleTheme}
-          className="w-full flex items-center justify-center"
-        >
-          {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-        </Button>
+      <SidebarFooter className="p-2 space-y-1">
+        {!collapsed && user && (
+          <p className="px-2 text-[11px] text-muted-foreground truncate">
+            {user.email}
+          </p>
+        )}
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            className="flex-1 flex items-center justify-center"
+          >
+            {theme === "dark" ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleSignOut}
+            className="flex-1 flex items-center justify-center text-muted-foreground hover:text-destructive"
+          >
+            <LogOut className="h-4 w-4" />
+          </Button>
+        </div>
       </SidebarFooter>
     </Sidebar>
   );

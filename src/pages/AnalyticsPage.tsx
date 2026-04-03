@@ -4,7 +4,15 @@ import { GaugeChart } from "@/components/charts/GaugeChart";
 import { StrategicMapCard } from "@/components/charts/StrategicMapCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 const gauges = [
   { name: "ROI", value: 82, status: "success" as const },
@@ -56,7 +64,10 @@ const strategicMap = [
 const AnalyticsPage = () => {
   return (
     <AppLayout>
-      <PageHeader title="Analítica" description="Dashboards interactivos y visualización de datos" />
+      <PageHeader
+        title="Analítica"
+        description="Dashboards interactivos y visualización de datos"
+      />
 
       <Tabs defaultValue="gauges">
         <TabsList>
@@ -70,7 +81,9 @@ const AnalyticsPage = () => {
             {gauges.map((g) => (
               <Card key={g.name} className="border-border/50">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">{g.name}</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    {g.name}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="flex justify-center pb-4">
                   <GaugeChart value={g.value} status={g.status} />
@@ -83,7 +96,11 @@ const AnalyticsPage = () => {
         <TabsContent value="strategic" className="mt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {strategicMap.map((p) => (
-              <StrategicMapCard key={p.perspective} perspective={p.perspective} kpis={p.kpis} />
+              <StrategicMapCard
+                key={p.perspective}
+                perspective={p.perspective}
+                kpis={p.kpis}
+              />
             ))}
           </div>
         </TabsContent>
@@ -91,14 +108,27 @@ const AnalyticsPage = () => {
         <TabsContent value="trends" className="mt-4">
           <Card className="border-border/50">
             <CardHeader>
-              <CardTitle className="text-sm font-medium">Tendencia Trimestral de KPIs (puntaje 0-10)</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Tendencia Trimestral de KPIs (puntaje 0-10)
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={320}>
                 <BarChart data={trendData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="period" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} domain={[0, 10]} />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="hsl(var(--border))"
+                  />
+                  <XAxis
+                    dataKey="period"
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={12}
+                  />
+                  <YAxis
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={12}
+                    domain={[0, 10]}
+                  />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: "hsl(var(--card))",
@@ -107,9 +137,24 @@ const AnalyticsPage = () => {
                       color: "hsl(var(--foreground))",
                     }}
                   />
-                  <Bar dataKey="roi" fill="hsl(var(--success))" radius={[4, 4, 0, 0]} name="ROI" />
-                  <Bar dataKey="nps" fill="hsl(var(--warning))" radius={[4, 4, 0, 0]} name="NPS" />
-                  <Bar dataKey="cycle" fill="hsl(var(--danger))" radius={[4, 4, 0, 0]} name="Tiempo Ciclo" />
+                  <Bar
+                    dataKey="roi"
+                    fill="hsl(var(--success))"
+                    radius={[4, 4, 0, 0]}
+                    name="ROI"
+                  />
+                  <Bar
+                    dataKey="nps"
+                    fill="hsl(var(--warning))"
+                    radius={[4, 4, 0, 0]}
+                    name="NPS"
+                  />
+                  <Bar
+                    dataKey="cycle"
+                    fill="hsl(var(--danger))"
+                    radius={[4, 4, 0, 0]}
+                    name="Tiempo Ciclo"
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>

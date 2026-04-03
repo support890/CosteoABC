@@ -32,17 +32,21 @@ export function GaugeChart({ value, status, size = 160 }: GaugeChartProps) {
   };
 
   // Needle endpoint
-  const needleRad = ((angle) * Math.PI) / 180;
+  const needleRad = (angle * Math.PI) / 180;
   const needleLen = radius - 15;
   const needleX = cx + needleLen * Math.cos(needleRad - Math.PI / 2 + Math.PI);
   // Corrected: needle points up at 0, rotates CW
-  const nRad = ((clampedValue / 100) * Math.PI);
+  const nRad = (clampedValue / 100) * Math.PI;
   const nX = cx - (radius - 20) * Math.cos(nRad);
   const nY = cy - (radius - 20) * Math.sin(nRad);
 
   return (
     <div className="flex flex-col items-center">
-      <svg width={size} height={size / 2 + 30} viewBox={`0 0 ${size} ${size / 2 + 30}`}>
+      <svg
+        width={size}
+        height={size / 2 + 30}
+        viewBox={`0 0 ${size} ${size / 2 + 30}`}
+      >
         {/* Background arc segments */}
         <path
           d={arcPath(0, 60)}
@@ -90,7 +94,10 @@ export function GaugeChart({ value, status, size = 160 }: GaugeChartProps) {
         />
         <circle cx={cx} cy={cy} r={4} fill="hsl(var(--foreground))" />
       </svg>
-      <span className="text-2xl font-bold mt-1" style={{ color: `hsl(${color})` }}>
+      <span
+        className="text-2xl font-bold mt-1"
+        style={{ color: `hsl(${color})` }}
+      >
         {clampedValue}%
       </span>
     </div>

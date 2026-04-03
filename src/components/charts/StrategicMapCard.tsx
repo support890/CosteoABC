@@ -34,7 +34,9 @@ export function StrategicMapCard({ perspective, kpis }: StrategicMapCardProps) {
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className={`h-2 w-2 rounded-full ${statusDot[kpi.status]}`} />
+              <div
+                className={`h-2 w-2 rounded-full ${statusDot[kpi.status]}`}
+              />
               <span className="text-sm font-medium">{kpi.name}</span>
             </div>
             <span className="text-sm font-bold">{kpi.score.toFixed(1)}</span>

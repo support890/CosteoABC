@@ -1,171 +1,508 @@
+import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, ChevronDown, Target, Plus } from "lucide-react";
-import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ChevronRight, ChevronDown, Target, Plus, Loader2 } from "lucide-react";
+import {
+  usePerspectives,
+  useKPIs,
+  type KPI,
+  type Perspective,
+} from "@/hooks/use-supabase-data";
+import { useToast } from "@/hooks/use-toast";
 
-interface KPINode {
-  id: string;
-  name: string;
-  direction: "maximize" | "minimize" | "stabilize";
-  weight: number;
-  actual?: number;
-  target?: number;
-  alarm?: number;
-  score?: number;
-  status: "success" | "warning" | "danger";
-  children?: KPINode[];
+/* ───── KPI status helper ───── */
+function getStatus(kpi: KPI): "success" | "warning" | "danger" {
+  if (kpi.threshold_green != null && kpi.current_value >= kpi.threshold_green)
+    return "success";
+  if (kpi.threshold_yellow != null && kpi.current_value >= kpi.threshold_yellow)
+    return "warning";
+  return "danger";
 }
 
-const strategyTree: KPINode[] = [
-  {
-    id: "f1",
-    name: "Perspectiva Financiera",
-    direction: "maximize",
-    weight: 35,
-    score: 7.8,
-    status: "success",
-    children: [
-      { id: "f1-1", name: "ROI", direction: "maximize", weight: 50, actual: 18, target: 15, alarm: 8, score: 8.2, status: "success" },
-      { id: "f1-2", name: "Margen Neto", direction: "maximize", weight: 50, actual: 12, target: 10, alarm: 5, score: 7.5, status: "success" },
-    ],
-  },
-  {
-    id: "c1",
-    name: "Perspectiva de Clientes",
-    direction: "maximize",
-    weight: 25,
-    score: 5.9,
-    status: "warning",
-    children: [
-      { id: "c1-1", name: "NPS", direction: "maximize", weight: 60, actual: 55, target: 70, alarm: 40, score: 5.8, status: "warning" },
-      { id: "c1-2", name: "Retención", direction: "maximize", weight: 40, actual: 78, target: 85, alarm: 60, score: 6.1, status: "warning" },
-    ],
-  },
-  {
-    id: "p1",
-    name: "Perspectiva de Procesos",
-    direction: "minimize",
-    weight: 25,
-    score: 5.5,
-    status: "warning",
-    children: [
-      { id: "p1-1", name: "Tiempo de Ciclo (días)", direction: "minimize", weight: 50, actual: 14, target: 7, alarm: 21, score: 3.2, status: "danger" },
-      { id: "p1-2", name: "Tasa de Defectos (%)", direction: "minimize", weight: 50, actual: 2.1, target: 3, alarm: 5, score: 7.9, status: "success" },
-    ],
-  },
-  {
-    id: "a1",
-    name: "Aprendizaje y Crecimiento",
-    direction: "maximize",
-    weight: 15,
-    score: 6.5,
-    status: "warning",
-    children: [
-      { id: "a1-1", name: "Horas Capacitación", direction: "maximize", weight: 50, actual: 42, target: 40, alarm: 20, score: 8.5, status: "success" },
-      { id: "a1-2", name: "Índice Innovación", direction: "maximize", weight: 50, actual: 3.2, target: 5, alarm: 2, score: 4.5, status: "warning" },
-    ],
-  },
-];
+const statusDot = {
+  success: "bg-success",
+  warning: "bg-warning",
+  danger: "bg-danger",
+};
 
-function KPITreeItem({ node, depth = 0 }: { node: KPINode; depth?: number }) {
+const statusText = {
+  success: "text-success",
+  warning: "text-warning",
+  danger: "text-danger",
+};
+
+/* ───── KPI Tree Item ───── */
+function KPITreeItem({
+  kpi,
+  allKpis,
+  depth = 0,
+  selectedId,
+  onSelect,
+}: {
+  kpi: KPI;
+  allKpis: KPI[];
+  depth?: number;
+  selectedId: string | null;
+  onSelect: (kpi: KPI) => void;
+}) {
   const [expanded, setExpanded] = useState(true);
-  const hasChildren = node.children && node.children.length > 0;
-
-  const statusDot = {
-    success: "bg-success",
-    warning: "bg-warning",
-    danger: "bg-danger",
-  };
+  const children = allKpis.filter((k) => k.parent_id === kpi.id);
+  const hasChildren = children.length > 0;
+  const status = getStatus(kpi);
 
   return (
     <div>
       <div
-        className="flex items-center gap-3 py-2 px-3 rounded-md hover:bg-accent/50 cursor-pointer transition-colors"
+        className={`flex items-center gap-3 py-2 px-3 rounded-md hover:bg-accent/50 cursor-pointer transition-colors ${selectedId === kpi.id ? "bg-accent" : ""}`}
         style={{ paddingLeft: `${depth * 24 + 12}px` }}
-        onClick={() => hasChildren && setExpanded(!expanded)}
+        onClick={() => {
+          onSelect(kpi);
+          if (hasChildren) setExpanded(!expanded);
+        }}
       >
         {hasChildren ? (
-          expanded ? <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" /> : <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+          expanded ? (
+            <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />
+          ) : (
+            <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+          )
         ) : (
           <Target className="h-4 w-4 text-muted-foreground shrink-0" />
         )}
-        <div className={`h-2 w-2 rounded-full ${statusDot[node.status]} shrink-0`} />
-        <span className={`text-sm ${depth === 0 ? "font-semibold" : "font-medium"} flex-1`}>{node.name}</span>
-        <span className="text-xs text-muted-foreground">{node.weight}%</span>
-        {node.score !== undefined && (
-          <span className={`text-sm font-bold ${node.status === "success" ? "text-success" : node.status === "warning" ? "text-warning" : "text-danger"}`}>
-            {node.score.toFixed(1)}
-          </span>
-        )}
+        <div className={`h-2 w-2 rounded-full ${statusDot[status]} shrink-0`} />
+        <span
+          className={`text-sm ${depth === 0 ? "font-semibold" : "font-medium"} flex-1`}
+        >
+          {kpi.name}
+        </span>
+        <span className="text-xs text-muted-foreground">{kpi.weight}%</span>
+        <span className={`text-sm font-bold ${statusText[status]}`}>
+          {kpi.current_value.toFixed(1)}
+        </span>
       </div>
-      {hasChildren && expanded && (
-        <div>
-          {node.children!.map((child) => (
-            <KPITreeItem key={child.id} node={child} depth={depth + 1} />
-          ))}
-        </div>
-      )}
+      {hasChildren &&
+        expanded &&
+        children.map((child) => (
+          <KPITreeItem
+            key={child.id}
+            kpi={child}
+            allKpis={allKpis}
+            depth={depth + 1}
+            selectedId={selectedId}
+            onSelect={onSelect}
+          />
+        ))}
     </div>
   );
 }
 
-const StrategyPage = () => {
+/* ───── Add KPI Dialog ───── */
+function AddKPIDialog({
+  perspectives,
+  kpis,
+  onCreate,
+  loading,
+}: {
+  perspectives: Perspective[];
+  kpis: KPI[];
+  onCreate: (kpi: Record<string, unknown>) => void;
+  loading: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [perspectiveId, setPerspectiveId] = useState("");
+  const [parentId, setParentId] = useState("none");
+  const [weight, setWeight] = useState("50");
+  const [targetValue, setTargetValue] = useState("");
+  const [thresholdGreen, setThresholdGreen] = useState("");
+  const [thresholdYellow, setThresholdYellow] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onCreate({
+      name,
+      perspective_id: perspectiveId,
+      parent_id: parentId === "none" ? null : parentId,
+      weight: parseFloat(weight),
+      target_value: targetValue ? parseFloat(targetValue) : null,
+      threshold_green: thresholdGreen ? parseFloat(thresholdGreen) : null,
+      threshold_yellow: thresholdYellow ? parseFloat(thresholdYellow) : null,
+      current_value: 0,
+    });
+    setName("");
+    setWeight("50");
+    setTargetValue("");
+    setThresholdGreen("");
+    setThresholdYellow("");
+    setOpen(false);
+  };
+
   return (
-    <AppLayout>
-      <PageHeader title="Estrategia (BSC)" description="Balanced Scorecard — Árbol de KPIs y Objetivos Estratégicos">
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
         <Button size="sm">
           <Plus className="h-4 w-4 mr-2" />
           Nuevo KPI
         </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Nuevo KPI</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4 mt-2">
+          <div className="space-y-2">
+            <Label>Nombre</Label>
+            <Input
+              placeholder="Ej: ROI"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Perspectiva</Label>
+              <Select value={perspectiveId} onValueChange={setPerspectiveId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar" />
+                </SelectTrigger>
+                <SelectContent>
+                  {perspectives.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Peso (%)</Label>
+              <Input
+                type="number"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label>KPI padre (opcional)</Label>
+            <Select value={parentId} onValueChange={setParentId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Ninguno (raíz)" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Ninguno (raíz)</SelectItem>
+                {kpis
+                  .filter((k) => !k.parent_id)
+                  .map((k) => (
+                    <SelectItem key={k.id} value={k.id}>
+                      {k.name}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="space-y-2">
+              <Label>Objetivo</Label>
+              <Input
+                type="number"
+                step="0.01"
+                placeholder="—"
+                value={targetValue}
+                onChange={(e) => setTargetValue(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Umbral verde</Label>
+              <Input
+                type="number"
+                step="0.01"
+                placeholder="—"
+                value={thresholdGreen}
+                onChange={(e) => setThresholdGreen(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Umbral amarillo</Label>
+              <Input
+                type="number"
+                step="0.01"
+                placeholder="—"
+                value={thresholdYellow}
+                onChange={(e) => setThresholdYellow(e.target.value)}
+              />
+            </div>
+          </div>
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={loading || !perspectiveId}
+          >
+            {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+            Crear KPI
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/* ───── Add Perspective Dialog ───── */
+function AddPerspectiveDialog({
+  onCreate,
+  loading,
+}: {
+  onCreate: (p: Record<string, unknown>) => void;
+  loading: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [weight, setWeight] = useState("25");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onCreate({ name, weight: parseFloat(weight) });
+    setName("");
+    setWeight("25");
+    setOpen(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline">
+          <Plus className="h-4 w-4 mr-2" />
+          Perspectiva
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Nueva Perspectiva</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4 mt-2">
+          <div className="space-y-2">
+            <Label>Nombre</Label>
+            <Input
+              placeholder="Ej: Financiera"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Peso (%)</Label>
+            <Input
+              type="number"
+              value={weight}
+              onChange={(e) => setWeight(e.target.value)}
+            />
+          </div>
+          <Button type="submit" className="w-full" disabled={loading}>
+            Crear
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/* ───── Page ───── */
+const StrategyPage = () => {
+  const { toast } = useToast();
+  const perspectives = usePerspectives();
+  const kpis = useKPIs();
+  const [selectedKPI, setSelectedKPI] = useState<KPI | null>(null);
+
+  const isLoading = perspectives.isLoading || kpis.isLoading;
+
+  // Group KPIs by perspective, showing root KPIs (no parent) per perspective
+  const rootKpis = kpis.items.filter((k) => !k.parent_id);
+
+  const handleCreateKPI = async (item: Record<string, unknown>) => {
+    try {
+      await kpis.create.mutateAsync(item as never);
+      toast({ title: "KPI creado" });
+    } catch (err: unknown) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: (err as Error).message,
+      });
+    }
+  };
+
+  const handleCreatePerspective = async (item: Record<string, unknown>) => {
+    try {
+      await perspectives.create.mutateAsync(item as never);
+      toast({ title: "Perspectiva creada" });
+    } catch (err: unknown) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: (err as Error).message,
+      });
+    }
+  };
+
+  const selected = selectedKPI;
+  const selStatus = selected ? getStatus(selected) : null;
+
+  return (
+    <AppLayout>
+      <PageHeader
+        title="Estrategia (BSC)"
+        description="Balanced Scorecard — Árbol de KPIs y Objetivos Estratégicos"
+      >
+        <AddPerspectiveDialog
+          onCreate={handleCreatePerspective}
+          loading={perspectives.create.isPending}
+        />
+        <AddKPIDialog
+          perspectives={perspectives.items}
+          kpis={kpis.items}
+          onCreate={handleCreateKPI}
+          loading={kpis.create.isPending}
+        />
       </PageHeader>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Tree View */}
-        <div className="lg:col-span-2">
-          <Card className="border-border/50">
-            <CardContent className="p-4">
-              {strategyTree.map((node) => (
-                <KPITreeItem key={node.id} node={node} />
-              ))}
-            </CardContent>
-          </Card>
+      {isLoading ? (
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <Card className="border-border/50">
+              <CardContent className="p-4">
+                {perspectives.items.length === 0 ? (
+                  <div className="py-12 text-center text-sm text-muted-foreground">
+                    Crea tu primera perspectiva (Financiera, Clientes, etc.)
+                    para empezar.
+                  </div>
+                ) : (
+                  perspectives.items.map((perspective) => {
+                    const perspKpis = rootKpis.filter(
+                      (k) => k.perspective_id === perspective.id,
+                    );
+                    return (
+                      <div key={perspective.id} className="mb-4">
+                        <div className="flex items-center gap-2 py-2 px-3 bg-muted/50 rounded-md mb-1">
+                          <span className="text-sm font-semibold flex-1">
+                            {perspective.name}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {perspective.weight}%
+                          </span>
+                        </div>
+                        {perspKpis.length === 0 ? (
+                          <p className="text-xs text-muted-foreground px-3 py-2">
+                            Sin KPIs en esta perspectiva
+                          </p>
+                        ) : (
+                          perspKpis.map((kpi) => (
+                            <KPITreeItem
+                              key={kpi.id}
+                              kpi={kpi}
+                              allKpis={kpis.items}
+                              selectedId={selectedKPI?.id ?? null}
+                              onSelect={setSelectedKPI}
+                            />
+                          ))
+                        )}
+                      </div>
+                    );
+                  })
+                )}
+              </CardContent>
+            </Card>
+          </div>
 
-        {/* Detail Panel */}
-        <div>
-          <Card className="border-border/50">
-            <CardContent className="p-4">
-              <h3 className="text-sm font-semibold mb-4">Detalle del KPI</h3>
-              <p className="text-xs text-muted-foreground mb-6">Selecciona un KPI del árbol para ver sus detalles y editar valores.</p>
-
-              <div className="space-y-4">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Valor Real</span>
-                  <span className="font-mono font-medium">—</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Objetivo</span>
-                  <span className="font-mono font-medium">—</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Alarma</span>
-                  <span className="font-mono font-medium">—</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Dirección</span>
-                  <span className="font-mono font-medium">—</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Puntaje (0-10)</span>
-                  <span className="font-mono font-medium">—</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div>
+            <Card className="border-border/50">
+              <CardContent className="p-4">
+                <h3 className="text-sm font-semibold mb-4">Detalle del KPI</h3>
+                {!selected ? (
+                  <p className="text-xs text-muted-foreground">
+                    Selecciona un KPI del árbol para ver sus detalles.
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div
+                        className={`h-3 w-3 rounded-full ${statusDot[selStatus!]}`}
+                      />
+                      <span className="font-medium">{selected.name}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">
+                        Valor actual
+                      </span>
+                      <span
+                        className={`font-mono font-bold ${statusText[selStatus!]}`}
+                      >
+                        {selected.current_value.toFixed(1)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Objetivo</span>
+                      <span className="font-mono font-medium">
+                        {selected.target_value?.toFixed(1) ?? "—"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">
+                        Umbral verde
+                      </span>
+                      <span className="font-mono font-medium">
+                        {selected.threshold_green?.toFixed(1) ?? "—"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">
+                        Umbral amarillo
+                      </span>
+                      <span className="font-mono font-medium">
+                        {selected.threshold_yellow?.toFixed(1) ?? "—"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Peso</span>
+                      <span className="font-mono font-medium">
+                        {selected.weight}%
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Unidad</span>
+                      <span className="font-mono font-medium">
+                        {selected.unit}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </div>
+      )}
     </AppLayout>
   );
 };
