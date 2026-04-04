@@ -667,7 +667,7 @@ export default function LandingPage() {
                 <img
                   src="/images/hero-abc-costing.png"
                   alt="The Black Box - Plataforma de costeo basado en actividades"
-                  className="relative rounded-2xl shadow-2xl shadow-primary/10 border border-border/30 w-full max-w-lg object-cover"
+                  className="relative rounded-2xl shadow-2xl shadow-primary/10 border border-border/30 w-full max-w-2xl object-cover"
                 />
               </div>
             </div>
@@ -853,12 +853,13 @@ export default function LandingPage() {
               <img
                 src="/images/rentabilidad-tablet.png"
                 alt="De recursos a rentabilidad - flujo ABC Costing"
-                className="relative rounded-2xl shadow-xl border border-border/30 w-full max-w-md object-cover"
+                className="relative rounded-2xl shadow-xl border border-border/30 w-full max-w-xl object-cover"
               />
             </div>
             <div>
               <h2 className="text-3xl font-bold mb-4">
-                De datos dispersos a{" "}
+                De datos dispersos a
+                <br />
                 <span className="text-primary">decisiones claras</span>
               </h2>
               <p className="text-muted-foreground leading-relaxed mb-6">
@@ -869,7 +870,7 @@ export default function LandingPage() {
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div className="rounded-lg bg-background/80 border border-border/50 p-4">
-                  <p className="text-2xl font-bold text-primary">5</p>
+                  <p className="text-2xl font-bold text-primary">20+</p>
                   <p className="text-xs text-muted-foreground">
                     Herramientas analíticas integradas
                   </p>
@@ -909,7 +910,7 @@ export default function LandingPage() {
             <img
               src="/images/businessman-abc.png"
               alt="Profesional usando The Black Box"
-              className="mx-auto mt-8 w-full max-w-2xl rounded-2xl shadow-lg border border-border/30"
+              className="mx-auto mt-8 w-full max-w-5xl rounded-2xl shadow-lg border border-border/30"
             />
           </div>
           <div className="grid gap-8 md:grid-cols-3">
@@ -1210,9 +1211,9 @@ export default function LandingPage() {
         <div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-primary/5 blur-3xl -z-10" />
         <div className="mx-auto max-w-4xl text-center">
           <img
-            src="/images/rentabilidad-flow.png"
+            src="/images/cta-final.png"
             alt="The Black Box plataforma"
-            className="mx-auto mb-10 w-full max-w-sm rounded-2xl shadow-lg border border-border/30 opacity-90"
+            className="mx-auto mb-10 w-full max-w-2xl rounded-2xl shadow-lg border border-border/30 opacity-90"
           />
           <h2 className="text-3xl font-bold">
             Deja de adivinar. Empieza a decidir.

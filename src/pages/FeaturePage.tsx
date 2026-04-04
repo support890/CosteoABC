@@ -32,12 +32,12 @@ interface FeatureDetail {
 }
 
 const featureImages: Record<string, string> = {
-  "costeo-abc": "/images/rentabilidad-tablet.png",
-  "bi-express": "/images/rentabilidad-flow.png",
-  "logistica": "/images/driver-relationships.png",
-  "forecast": "/images/rentabilidad-flow.png",
-  "estrategia-bsc": "/images/rentabilidad-flow.png",
-  "seguridad-multi-tenant": "/images/hero-abc-costing.png",
+  "costeo-abc": "/images/costeo-abc-hero.png",
+  "bi-express": "/images/bi-express-hero.png",
+  "logistica": "/images/logistica-hero.png",
+  "forecast": "/images/forecast-hero.png",
+  "estrategia-bsc": "/images/bsc-hero.png",
+  "seguridad-multi-tenant": "/images/seguridad-hero.png",
 };
 
 const featureData: Record<string, FeatureDetail> = {
@@ -352,7 +352,7 @@ export default function FeaturePage() {
                 <img
                   src={featureImages[feature.slug]}
                   alt={`${feature.title} - The Black Box`}
-                  className="relative rounded-2xl shadow-xl border border-border/30 w-full max-w-md object-cover"
+                  className="relative rounded-2xl shadow-xl border border-border/30 w-full max-w-6xl object-cover"
                 />
               </div>
             )}
