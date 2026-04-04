@@ -749,7 +749,7 @@ function DriverCard({
       <CardContent className="p-4">
         {/* Header row */}
         <div className="flex items-center gap-4 flex-wrap">
-          <div className={`rounded-lg px-4 py-3 w-[380px] shrink-0 ${
+          <div className={`rounded-lg px-4 py-3 w-full sm:w-[380px] sm:shrink-0 ${
             driver.source_type === "activity" || driver.source_type === "activity_center"
               ? "bg-warning/10 border border-warning/20"
               : "bg-primary/10 border border-primary/20"

@@ -349,7 +349,7 @@ function ExpenseDialog({
           <DialogTitle>{editItem ? "Editar Gasto" : "Nuevo Gasto"}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="space-y-1">
               <Label className="text-xs">Código</Label>
               <Input value={code} onChange={(e) => setCode(e.target.value)} className="h-9 text-sm font-mono" />
@@ -455,7 +455,7 @@ function CenterDialog({
           <DialogTitle>{editItem ? "Editar Centro" : "Nuevo Centro"}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="space-y-1">
               <Label className="text-xs">Código</Label>
               <Input value={code} onChange={(e) => setCode(e.target.value)} className="h-9 text-sm font-mono" />
@@ -731,9 +731,10 @@ function ExpenseTreeView({
   }
 
   return (
-    <div className="text-sm">
+    <div className="overflow-x-auto">
+    <div className="text-sm min-w-[520px]">
       {/* Header */}
-      <div className="flex items-center gap-2 py-2 px-3 border-b border-border bg-muted/40 text-xs font-medium text-muted-foreground sticky top-0 z-10">
+      <div className="flex items-center gap-2 py-2 px-3 border-b border-border bg-muted/40 text-xs font-medium text-muted-foreground">
         <span className="w-4" />
         <span className="w-4" />
         <span className="w-20 shrink-0">Código</span>
@@ -813,6 +814,7 @@ function ExpenseTreeView({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </div>
     </div>
   );
 }
@@ -1086,7 +1088,7 @@ export default function LogisticsPage() {
 
         <Card className="flex-[0.9] bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-primary/20">
           <CardContent className="p-3">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="text-left">
                 <p className="text-[10px] text-muted-foreground mb-0.5">P.E. Mensual</p>
                 <p className="text-sm font-bold text-primary">{fmtCurrency(results.punto_equilibrio_mensual, currSymbol)}</p>

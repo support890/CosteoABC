@@ -195,7 +195,7 @@ function AddKPIDialog({
               </SelectContent>
             </Select>
           </div>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="space-y-2">
               <Label>Objetivo</Label>
               <Input type="number" step="0.01" placeholder="—" value={targetValue} onChange={(e) => setTargetValue(e.target.value)} />

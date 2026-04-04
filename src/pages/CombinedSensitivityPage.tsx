@@ -856,7 +856,7 @@ const CombinedSensitivityPage = () => {
       <div className="space-y-6">
         {/* Input panels: Recursos + Drivers */}
         <Tabs defaultValue="recursos">
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
             <TabsList>
               <TabsTrigger value="recursos" className="gap-1.5">
                 <DollarSign className="h-3.5 w-3.5" />

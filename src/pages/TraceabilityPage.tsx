@@ -270,7 +270,7 @@ const TraceabilityPage = () => {
                     {subtypeLabels[traceData.summary.type] || traceData.summary.type}
                   </Badge>
                 </div>
-                <div className="flex gap-6">
+                <div className="flex flex-wrap gap-4 sm:gap-6">
                   <div className="text-center">
                     <p className="text-xs text-muted-foreground">Costo ABC</p>
                     <p className="text-lg font-bold font-mono">

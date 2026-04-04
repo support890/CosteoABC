@@ -206,7 +206,7 @@ export default function ForecastPage() {
             <div className="lg:col-span-2">
               <Card>
                 <CardHeader className="pb-4">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <CardTitle className="text-base">Serie de Tiempo Histórica</CardTitle>
                       <CardDescription>

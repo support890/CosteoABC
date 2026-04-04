@@ -434,7 +434,7 @@ export default function CrossAnalysisPage() {
                   Dimensión primaria
                 </label>
                 <Select value={selectedDimId} onValueChange={setSelectedDimId}>
-                  <SelectTrigger className="w-56">
+                  <SelectTrigger className="w-full sm:w-56">
                     <SelectValue placeholder="Seleccioná una dimensión…" />
                   </SelectTrigger>
                   <SelectContent>
@@ -455,7 +455,7 @@ export default function CrossAnalysisPage() {
                   value={secondDimId || "none"}
                   onValueChange={(v) => setSecondDimId(v === "none" ? "" : v)}
                 >
-                  <SelectTrigger className="w-56">
+                  <SelectTrigger className="w-full sm:w-56">
                     <SelectValue placeholder="Sin cruce" />
                   </SelectTrigger>
                   <SelectContent>

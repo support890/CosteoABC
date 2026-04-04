@@ -1896,6 +1896,7 @@ function ResourceTreeView({
             <circle cx="5" cy="9" r="1" />
           </svg>
         </div>
+        <span className="w-4 shrink-0" />
         <div className="flex flex-col flex-1 min-w-0">
           <span className="font-mono text-sm text-muted-foreground leading-tight">
             {item.code}
@@ -2174,9 +2175,10 @@ function ResourceTreeView({
     draggingId && dropTargetId === "__orphan__" && !isAlreadyOrphan;
 
   return (
-    <div className="text-sm">
+    <div className="overflow-x-auto">
+    <div className="text-sm min-w-[1280px]">
       {/* Header */}
-      <div className="flex items-center gap-2 py-2 px-3 border-b border-border bg-muted/40 text-xs font-medium text-muted-foreground sticky top-0">
+      <div className="flex items-center gap-2 py-2 px-3 border-b border-border bg-muted/40 text-xs font-medium text-muted-foreground">
         <span className="w-4" />
         <span className="w-4" />
         <span className="flex-1">Código / Nombre</span>
@@ -2313,6 +2315,7 @@ function ResourceTreeView({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </div>
     </div>
   );
 }
@@ -2807,6 +2810,7 @@ function ActivityTreeView({
             <circle cx="5" cy="9" r="1" />
           </svg>
         </div>
+        <span className="w-4 shrink-0" />
         <div className="flex flex-col flex-1 min-w-0">
           <span className="font-mono text-sm text-muted-foreground leading-tight">
             {item.code}
@@ -3084,9 +3088,10 @@ function ActivityTreeView({
     draggingId && dropTargetId === "__orphan__" && !isAlreadyOrphan;
 
   return (
-    <div className="text-sm">
+    <div className="overflow-x-auto">
+    <div className="text-sm min-w-[1280px]">
       {/* Header */}
-      <div className="flex items-center gap-2 py-2 px-3 border-b border-border bg-muted/40 text-xs font-medium text-muted-foreground sticky top-0">
+      <div className="flex items-center gap-2 py-2 px-3 border-b border-border bg-muted/40 text-xs font-medium text-muted-foreground">
         <span className="w-4" />
         <span className="w-4" />
         <span className="flex-1">Código / Nombre</span>
@@ -3218,6 +3223,7 @@ function ActivityTreeView({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </div>
     </div>
   );
 }
@@ -3695,6 +3701,7 @@ function CostObjectTreeView({
             <circle cx="5" cy="9" r="1" />
           </svg>
         </div>
+        <span className="w-4 shrink-0" />
         <div className="flex flex-col flex-1 min-w-0">
           <span className="font-mono text-sm text-muted-foreground leading-tight">
             {item.code}
@@ -3973,8 +3980,9 @@ function CostObjectTreeView({
     draggingId && dropTargetId === "__orphan__" && !isAlreadyOrphan;
 
   return (
-    <div className="text-sm">
-      <div className="flex items-center gap-2 py-2 px-3 border-b border-border bg-muted/40 text-xs font-medium text-muted-foreground sticky top-0">
+    <div className="overflow-x-auto">
+    <div className="text-sm min-w-[1280px]">
+      <div className="flex items-center gap-2 py-2 px-3 border-b border-border bg-muted/40 text-xs font-medium text-muted-foreground">
         <span className="w-4" />
         <span className="w-4" />
         <span className="flex-1">Código / Nombre</span>
@@ -4101,6 +4109,7 @@ function CostObjectTreeView({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </div>
     </div>
   );
 }
@@ -4991,34 +5000,40 @@ const DictionariesPage = () => {
             const fmtT = (n: number) => n.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             return (
           <TabsList className="h-auto py-1 w-full grid grid-cols-3">
-            <TabsTrigger value="resources" className="flex flex-col items-center gap-0.5 py-2">
-              <span>
-                Recursos ({resources.items.length}
-                {costCenters.items.length > 0 ? ` / ${costCenters.items.length} centros` : ""})
+            <TabsTrigger value="resources" className="flex flex-col items-center gap-0.5 py-2 px-1">
+              <span className="text-center leading-tight">
+                <span className="hidden sm:inline">Recursos</span>
+                <span className="sm:hidden">Rec.</span>
+                {" "}({resources.items.length}
+                <span className="hidden sm:inline">{costCenters.items.length > 0 ? ` / ${costCenters.items.length} centros` : ""}</span>)
               </span>
               <span className={`text-xs font-normal inline-flex items-center gap-1 leading-none ${allEqual ? "text-green-500" : "text-muted-foreground"}`}>
                 {allEqual && <CheckCircle2 className="h-3 w-3" />}
-                Total: {fmtT(rT)} {currencySymbol}
+                <span className="hidden sm:inline">Total: </span>{fmtT(rT)} {currencySymbol}
               </span>
             </TabsTrigger>
-            <TabsTrigger value="activities" className="flex flex-col items-center gap-0.5 py-2">
-              <span>
-                Actividades ({activities.items.length}
-                {activityCenters.items.length > 0 ? ` / ${activityCenters.items.length} centros` : ""})
+            <TabsTrigger value="activities" className="flex flex-col items-center gap-0.5 py-2 px-1">
+              <span className="text-center leading-tight">
+                <span className="hidden sm:inline">Actividades</span>
+                <span className="sm:hidden">Activ.</span>
+                {" "}({activities.items.length}
+                <span className="hidden sm:inline">{activityCenters.items.length > 0 ? ` / ${activityCenters.items.length} centros` : ""}</span>)
               </span>
               <span className={`text-xs font-normal inline-flex items-center gap-1 leading-none ${actOk ? "text-green-500" : actWarn ? "text-amber-500" : "text-muted-foreground"}`}>
                 {actOk && <CheckCircle2 className="h-3 w-3" />}
-                Total: {fmtT(aT)} {currencySymbol}
+                <span className="hidden sm:inline">Total: </span>{fmtT(aT)} {currencySymbol}
               </span>
             </TabsTrigger>
-            <TabsTrigger value="objects" className="flex flex-col items-center gap-0.5 py-2">
-              <span>
-                Objetos de Costo ({costObjects.items.length}
-                {costObjectCenters.items.length > 0 ? ` / ${costObjectCenters.items.length} centros` : ""})
+            <TabsTrigger value="objects" className="flex flex-col items-center gap-0.5 py-2 px-1">
+              <span className="text-center leading-tight">
+                <span className="hidden sm:inline">Objetos de Costo</span>
+                <span className="sm:hidden">Objetos</span>
+                {" "}({costObjects.items.length}
+                <span className="hidden sm:inline">{costObjectCenters.items.length > 0 ? ` / ${costObjectCenters.items.length} centros` : ""}</span>)
               </span>
               <span className={`text-xs font-normal inline-flex items-center gap-1 leading-none ${objOk ? "text-green-500" : objWarn ? "text-amber-500" : "text-muted-foreground"}`}>
                 {objOk && <CheckCircle2 className="h-3 w-3" />}
-                Total: {fmtT(oT)} {currencySymbol}
+                <span className="hidden sm:inline">Total: </span>{fmtT(oT)} {currencySymbol}
               </span>
             </TabsTrigger>
           </TabsList>
