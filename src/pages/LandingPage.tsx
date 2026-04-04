@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -478,6 +478,38 @@ export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
+  const row1Ref = useRef<HTMLDivElement>(null);
+  const row2Ref = useRef<HTMLDivElement>(null);
+  const dragState = useRef({ isDragging: false, startX: 0, startDelay: 0, inverted: false, row: null as HTMLDivElement | null });
+  const ANIM_DURATION = 60;
+
+  const onDragStart = (e: React.MouseEvent, ref: React.RefObject<HTMLDivElement>, inverted: boolean) => {
+    const el = ref.current;
+    if (!el) return;
+    const currentDelay = parseFloat(window.getComputedStyle(el).animationDelay) || 0;
+    el.style.animationPlayState = "paused";
+    el.style.cursor = "grabbing";
+    dragState.current = { isDragging: true, startX: e.clientX, startDelay: currentDelay, inverted, row: el };
+  };
+
+  const onDragEnd = () => {
+    const { row } = dragState.current;
+    if (!row) return;
+    dragState.current.isDragging = false;
+    row.style.animationPlayState = "running";
+    row.style.cursor = "grab";
+  };
+
+  const onDragMove = (e: React.MouseEvent) => {
+    const { isDragging, startX, startDelay, inverted, row } = dragState.current;
+    if (!isDragging || !row) return;
+    e.preventDefault();
+    const deltaX = e.clientX - startX;
+    const contentWidth = row.scrollWidth / 2;
+    const deltaTime = (deltaX / contentWidth) * ANIM_DURATION * (inverted ? -1 : 1);
+    row.style.animationDelay = `${startDelay + deltaTime}s`;
+  };
+
   useEffect(() => {
     if (location.hash) {
       const el = document.querySelector(location.hash);
@@ -674,7 +706,7 @@ export default function LandingPage() {
           </div>
           {/* Integration logos carousel */}
           <div className="mt-16 text-center">
-            <p className="text-xs text-muted-foreground mb-6">Compatible con</p>
+            <p className="text-2xl text-muted-foreground mb-6">Compatible con</p>
             <div className="relative overflow-hidden">
               <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-background to-transparent z-10" />
               <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-background to-transparent z-10" />
@@ -719,7 +751,14 @@ export default function LandingPage() {
         <div className="relative mb-6">
           <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-muted/80 to-transparent z-10 pointer-events-none" />
           <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-muted/80 to-transparent z-10 pointer-events-none" />
-          <div className="flex gap-6 animate-scroll-left hover:[animation-play-state:paused]">
+          <div
+            ref={row1Ref}
+            className="flex gap-6 animate-scroll-left hover:[animation-play-state:paused] cursor-grab select-none"
+            onMouseDown={(e) => onDragStart(e, row1Ref, false)}
+            onMouseUp={onDragEnd}
+            onMouseLeave={onDragEnd}
+            onMouseMove={onDragMove}
+          >
             {[...testimonials.slice(0, 12), ...testimonials.slice(0, 12)].map(
               (t, i) => (
                 <Card
@@ -767,7 +806,14 @@ export default function LandingPage() {
         <div className="relative">
           <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-muted/80 to-transparent z-10 pointer-events-none" />
           <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-muted/80 to-transparent z-10 pointer-events-none" />
-          <div className="flex gap-6 animate-scroll-right hover:[animation-play-state:paused]">
+          <div
+            ref={row2Ref}
+            className="flex gap-6 animate-scroll-right hover:[animation-play-state:paused] cursor-grab select-none"
+            onMouseDown={(e) => onDragStart(e, row2Ref, true)}
+            onMouseUp={onDragEnd}
+            onMouseLeave={onDragEnd}
+            onMouseMove={onDragMove}
+          >
             {[...testimonials.slice(12), ...testimonials.slice(12)].map(
               (t, i) => (
                 <Card

@@ -1,10 +1,13 @@
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, ArrowLeft } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 
 export default function TermsPage() {
   const { theme, toggleTheme } = useTheme();
+
+  useEffect(() => { window.scrollTo(0, 0); }, []);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -31,6 +34,13 @@ export default function TermsPage() {
           </div>
         </div>
       </nav>
+
+      <div className="mx-auto max-w-3xl px-6 pt-8">
+        <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowLeft className="h-4 w-4" />
+          Home
+        </Link>
+      </div>
 
       <article className="mx-auto max-w-3xl px-6 py-16 prose prose-sm dark:prose-invert prose-headings:font-bold prose-p:text-muted-foreground prose-li:text-muted-foreground">
         <h1 className="text-3xl font-extrabold text-foreground">

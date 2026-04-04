@@ -302,9 +302,6 @@ export default function FeaturePage() {
                 <Moon className="h-4 w-4" />
               )}
             </Button>
-            <Button variant="ghost" asChild>
-              <Link to="/#features">Funcionalidades</Link>
-            </Button>
             <Button asChild size="sm">
               <Link to="/login">Ingresar</Link>
             </Button>
