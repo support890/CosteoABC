@@ -13,6 +13,7 @@ import {
   Calendar,
   Box,
   Building2,
+  Users,
 } from "lucide-react";
 import { useModels, usePeriods } from "@/hooks/use-supabase-data";
 import { useBIModels } from "@/hooks/use-bi-express-data";
@@ -20,6 +21,8 @@ import { useLogisticsModels } from "@/hooks/use-logistics-data";
 import { useForecastModels } from "@/hooks/use-forecast-data";
 import { useBSCModels } from "@/hooks/use-bsc-data";
 import { useTenant } from "@/hooks/use-tenant";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 
 /* ── Small stat pill inside a tool card ── */
 function Stat({ value, label }: { value: number; label: string }) {
@@ -122,6 +125,20 @@ function ToolCard({
 ══════════════════════════════════════════════════════════ */
 const Index = () => {
   const { tenant, loading: tenantLoading } = useTenant();
+  const [userCount, setUserCount] = useState<number>(0);
+  const [usersLoading, setUsersLoading] = useState(true);
+
+  useEffect(() => {
+    if (!tenant) return;
+    supabase
+      .from("tenant_members")
+      .select("id", { count: "exact", head: true })
+      .eq("tenant_id", tenant.id)
+      .then(({ count }) => {
+        setUserCount(count ?? 0);
+        setUsersLoading(false);
+      });
+  }, [tenant]);
 
   const abcModels = useModels();
   const biModels = useBIModels();
@@ -132,6 +149,7 @@ const Index = () => {
 
   const isLoading =
     tenantLoading ||
+    usersLoading ||
     abcModels.isLoading ||
     biModels.isLoading ||
     logisticsModels.isLoading ||
@@ -211,17 +229,17 @@ const Index = () => {
           </CardContent>
         </Card>
 
-        {/* BSC models */}
+        {/* Users */}
         <Card className="border-border/50">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-muted-foreground">Modelos BSC</p>
-                <p className="text-2xl font-bold mt-1">{bscModels.items.length}</p>
-                <p className="text-xs text-primary mt-1">Balanced Scorecard</p>
+                <p className="text-xs text-muted-foreground">Usuarios</p>
+                <p className="text-2xl font-bold mt-1">{userCount}</p>
+                <p className="text-xs text-primary mt-1">en esta cuenta</p>
               </div>
               <div className="h-10 w-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                <Target className="h-5 w-5 text-emerald-500" />
+                <Users className="h-5 w-5 text-emerald-500" />
               </div>
             </div>
           </CardContent>

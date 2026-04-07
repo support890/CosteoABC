@@ -1326,7 +1326,7 @@ const CombinedSensitivityPage = () => {
                       );
                     })}
                     <TableRow className="bg-muted/50 font-semibold">
-                      <TableCell colSpan={2} className="text-right text-xs">TOTAL</TableCell>
+                      <TableCell className="text-xs">TOTAL</TableCell>
                       <TableCell className="text-right font-mono text-xs">{fmt(totalOriginal)}</TableCell>
                       <TableCell className="text-right font-mono text-xs">{fmt(totalSimulated)}</TableCell>
                       <TableCell
