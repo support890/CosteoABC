@@ -157,18 +157,20 @@ const plans = [
   {
     name: "Starter",
     audience: "Para la PyME individual",
-    price: 49,
+    price: 89,
     period: "/mes",
-    annualNote: "o $39/mes facturado anualmente",
+    annualNote: "",
     description:
-      "Accede a las 5 herramientas analíticas de The Black Box en la nube.",
+      "Accede a las herramientas analíticas de The Black Box en la nube.",
     features: [
-      "1 Empresa (Tenant)",
-      "Hasta 3 usuarios",
-      "1 Modelo de Costos activo",
-      "1 Tablero BSC",
-      "Importación por Excel",
-      "Soporte por email",
+      "3 Modelos activos",
+      "5 Usuarios",
+      "Periodos ilimitados",
+      "Plantillas de modelos predefinidos",
+      "Importación en Excel",
+      "Exportación a Excel/PDF",
+      "Multi-moneda",
+      "Chat de soporte",
     ],
     cta: "Iniciar prueba gratuita",
     highlighted: false,
@@ -176,17 +178,18 @@ const plans = [
   {
     name: "Pro",
     audience: "Para Consultores y PyMEs medianas",
-    price: 199,
+    price: 159,
     period: "/mes",
-    annualNote: "o $159/mes facturado anualmente",
+    annualNote: "",
     description:
-      "Gestiona múltiples empresas, simulaciones ilimitadas y alertas automatizadas.",
+      "Modelos ilimitados, simulaciones y alertas automatizadas.",
     features: [
-      "Hasta 5 Empresas (Tenants)",
+      "Modelos ilimitados",
       "Usuarios ilimitados",
-      "Modelos y simulaciones ilimitados",
-      "Módulo completo de Alertas",
-      "Reportes OLAP avanzados",
+      "Historial ilimitado",
+      "Comparativas entre periodos",
+      "Reportes avanzados",
+      "Exportación customizada (PDF branded)",
       "Soporte prioritario",
     ],
     cta: "Iniciar prueba gratuita",
@@ -202,11 +205,11 @@ const plans = [
     description:
       "Base de datos aislada, conectores ERP nativos y SLA dedicado.",
     features: [
-      "Tenants y usuarios ilimitados",
       "Base de datos aislada (Silo)",
-      "API nativa (SAP, Oracle, Defontana)",
+      "Integración con API nativa (SAP, Oracle, Defontana)",
       "SLA garantizado (99.9%)",
-      "Soporte dedicado 24/7",
+      "Backup dedicado y recuperación ante desastres",
+      "Gerente de cuenta dedicado",
       "Onboarding personalizado",
     ],
     cta: "Contactar ventas",
@@ -217,47 +220,65 @@ const plans = [
 
 const comparisonRows = [
   {
-    feature: "Empresas (Tenants)",
-    starter: "1",
-    pro: "Hasta 5",
-    enterprise: "Ilimitados",
-  },
-  {
     feature: "Usuarios",
-    starter: "3",
+    starter: "5",
     pro: "Ilimitados",
     enterprise: "Ilimitados",
   },
   {
     feature: "Modelos de costos",
-    starter: "1",
+    starter: "3",
     pro: "Ilimitados",
     enterprise: "Ilimitados",
   },
   {
-    feature: "Tableros BSC",
-    starter: "1",
+    feature: "Periodos",
+    starter: "Ilimitados",
     pro: "Ilimitados",
     enterprise: "Ilimitados",
   },
-  { feature: "Importación Excel", starter: true, pro: true, enterprise: true },
+  {
+    feature: "Plantillas predefinidas",
+    starter: true,
+    pro: true,
+    enterprise: true,
+  },
+  { feature: "Importación en Excel", starter: true, pro: true, enterprise: true },
+  {
+    feature: "Exportación Excel/PDF",
+    starter: true,
+    pro: true,
+    enterprise: true,
+  },
+  {
+    feature: "Exportación PDF branded",
+    starter: false,
+    pro: true,
+    enterprise: true,
+  },
+  { feature: "Multi-moneda", starter: true, pro: true, enterprise: true },
+  {
+    feature: "Historial ilimitado",
+    starter: false,
+    pro: true,
+    enterprise: true,
+  },
+  {
+    feature: "Comparativas entre periodos",
+    starter: false,
+    pro: true,
+    enterprise: true,
+  },
+  {
+    feature: "Reportes avanzados",
+    starter: false,
+    pro: true,
+    enterprise: true,
+  },
   {
     feature: "Conectores API / ERP",
     starter: false,
     pro: false,
-    enterprise: true,
-  },
-  {
-    feature: "Alertas automatizadas",
-    starter: false,
-    pro: true,
-    enterprise: true,
-  },
-  { feature: "Reportes OLAP", starter: false, pro: true, enterprise: true },
-  {
-    feature: "Simulaciones de escenarios",
-    starter: false,
-    pro: true,
     enterprise: true,
   },
   {
@@ -266,12 +287,30 @@ const comparisonRows = [
     pro: false,
     enterprise: true,
   },
-  { feature: "SLA garantizado", starter: false, pro: false, enterprise: true },
+  { feature: "SLA garantizado (99.9%)", starter: false, pro: false, enterprise: true },
   {
-    feature: "Soporte dedicado 24/7",
+    feature: "Backup dedicado",
     starter: false,
     pro: false,
     enterprise: true,
+  },
+  {
+    feature: "Gerente de cuenta dedicado",
+    starter: false,
+    pro: false,
+    enterprise: true,
+  },
+  {
+    feature: "Onboarding personalizado",
+    starter: false,
+    pro: false,
+    enterprise: true,
+  },
+  {
+    feature: "Soporte",
+    starter: "Chat y Email",
+    pro: "Prioritario",
+    enterprise: "24/7",
   },
 ];
 
@@ -441,11 +480,7 @@ const faqs = [
   },
   {
     q: "¿Puedo cambiar de plan en cualquier momento?",
-    a: "Sí. Puedes escalar de Starter a Pro o Enterprise en cualquier momento. El cambio se aplica inmediatamente y se prorratea la diferencia. Si reduces tu plan, el cambio se aplica al siguiente ciclo de facturación.",
-  },
-  {
-    q: "¿Ofrecen descuentos para facturación anual?",
-    a: "Sí. La facturación anual tiene un 20% de descuento (equivalente a 2 meses gratis). Starter: $39/mes, Pro: $159/mes. Enterprise tiene precios personalizados con contratos anuales.",
+    a: "Sí. Puedes escalar de Starter a Pro o Enterprise en cualquier momento. El cambio se aplica de inmediato. Para el plan Enterprise contáctanos para un contrato a medida.",
   },
   {
     q: "¿Se integra con mi ERP (SAP, Oracle, Defontana)?",
@@ -1125,9 +1160,11 @@ export default function LandingPage() {
                       </span>
                     )}
                   </div>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {plan.annualNote}
-                  </p>
+                  {plan.annualNote && (
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {plan.annualNote}
+                    </p>
+                  )}
                 </CardHeader>
                 <CardContent className="flex flex-1 flex-col pt-4">
                   <p className="mb-6 text-sm text-muted-foreground">
@@ -1156,8 +1193,10 @@ export default function LandingPage() {
             ))}
           </div>
           <p className="mt-8 text-center text-xs text-muted-foreground">
-            Todos los precios en USD. Ahorra un 20% con facturación anual. IVA
-            no incluido.
+            Todos los precios en USD.
+          </p>
+          <p className="mt-4 text-center text-sm text-muted-foreground border border-border/50 rounded-lg py-3 px-6 max-w-2xl mx-auto">
+            En cualquier plan se puede solicitar la creación de <span className="text-foreground font-medium">módulos personalizables</span> adaptados a las necesidades específicas de cada cliente.
           </p>
         </div>
       </section>

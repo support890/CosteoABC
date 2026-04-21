@@ -42,7 +42,10 @@ export function useBIModels() {
       if (error) throw error;
       return data as Model;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["models", tenantId, BI_MODULE] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["models", tenantId, BI_MODULE] });
+      qc.invalidateQueries({ queryKey: ["plan-limits-models", tenantId] });
+    },
   });
 
   const update = useMutation({

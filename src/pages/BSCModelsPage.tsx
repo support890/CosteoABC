@@ -51,6 +51,8 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { usePlanLimits } from "@/hooks/use-plan-limits";
+import { UsageDialog } from "@/components/UsageDialog";
 
 /* ── Period helpers ──────────────────────────────────── */
 const months = [
@@ -380,6 +382,8 @@ export default function BSCModelsPage() {
   const { setSelectedBSCModel, setSelectedBSCPeriod } = useBSCContext();
   const navigate = useNavigate();
 
+  const { canCreateModel } = usePlanLimits();
+  const [limitDialogOpen, setLimitDialogOpen] = useState(false);
   const [openModelDialog, setOpenModelDialog] = useState(false);
   const [editingModel, setEditingModel] = useState<Model | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -437,12 +441,15 @@ export default function BSCModelsPage() {
             description="Balanced Scorecard — define modelos estratégicos y evalúa KPIs por período"
           />
           <Dialog open={openModelDialog} onOpenChange={setOpenModelDialog}>
-            <DialogTrigger asChild>
-              <Button onClick={() => { setNewModel({ name: "", description: "" }); setEditingModel(null); }}>
-                <Plus className="h-4 w-4 mr-2" />
-                Nuevo Modelo BSC
-              </Button>
-            </DialogTrigger>
+            <Button onClick={() => {
+              if (!canCreateModel) { setLimitDialogOpen(true); return; }
+              setNewModel({ name: "", description: "" });
+              setEditingModel(null);
+              setOpenModelDialog(true);
+            }}>
+              <Plus className="h-4 w-4 mr-2" />
+              Nuevo Modelo BSC
+            </Button>
             <DialogContent className="sm:max-w-[500px]">
               <DialogHeader>
                 <DialogTitle>Crear Modelo BSC</DialogTitle>
@@ -569,6 +576,7 @@ export default function BSCModelsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <UsageDialog open={limitDialogOpen} onOpenChange={setLimitDialogOpen} showUpgrade />
     </AppLayout>
   );
 }

@@ -55,6 +55,8 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { usePlanLimits } from "@/hooks/use-plan-limits";
+import { UsageDialog } from "@/components/UsageDialog";
 
 const BASE_CURRENCIES = [
   { code: "BOB", name: "Boliviano", symbol: "Bs." },
@@ -95,6 +97,8 @@ export default function ForecastModelsPage() {
   const { setSelectedForecastModel, setSelectedForecastPeriod } = useForecastContext();
   const navigate = useNavigate();
 
+  const { canCreateModel } = usePlanLimits();
+  const [limitDialogOpen, setLimitDialogOpen] = useState(false);
   const [openModelDialog, setOpenModelDialog] = useState(false);
   const [editingModel, setEditingModel] = useState<Model | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -158,15 +162,15 @@ export default function ForecastModelsPage() {
             description="Predicción de ventas basada en datos históricos con algoritmos estadísticos avanzados"
           />
           <Dialog open={openModelDialog} onOpenChange={setOpenModelDialog}>
-            <DialogTrigger asChild>
-              <Button onClick={() => {
-                setNewModel({ name: "", description: "", base_currency: "BOB", type: "comercio" });
-                setEditingModel(null);
-              }}>
-                <Plus className="h-4 w-4 mr-2" />
-                Nuevo Escenario
-              </Button>
-            </DialogTrigger>
+            <Button onClick={() => {
+              if (!canCreateModel) { setLimitDialogOpen(true); return; }
+              setNewModel({ name: "", description: "", base_currency: "BOB", type: "comercio" });
+              setEditingModel(null);
+              setOpenModelDialog(true);
+            }}>
+              <Plus className="h-4 w-4 mr-2" />
+              Nuevo Escenario
+            </Button>
             <DialogContent className="sm:max-w-[600px]">
               <DialogHeader>
                 <DialogTitle>Crear Escenario de Forecast</DialogTitle>
@@ -386,6 +390,7 @@ export default function ForecastModelsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <UsageDialog open={limitDialogOpen} onOpenChange={setLimitDialogOpen} showUpgrade />
     </AppLayout>
   );
 }

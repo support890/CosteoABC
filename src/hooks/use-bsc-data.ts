@@ -39,7 +39,10 @@ export function useBSCModels() {
       if (error) throw error;
       return data as Model;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["models", tenantId, BSC_MODULE] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["models", tenantId, BSC_MODULE] });
+      qc.invalidateQueries({ queryKey: ["plan-limits-models", tenantId] });
+    },
   });
 
   const update = useMutation({

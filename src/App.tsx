@@ -20,6 +20,7 @@ import TermsPage from "./pages/TermsPage.tsx";
 import PrivacyPage from "./pages/PrivacyPage.tsx";
 import Index from "./pages/Index.tsx";
 import AdminPage from "./pages/AdminPage.tsx";
+import SuperAdminPage from "./pages/SuperAdminPage.tsx";
 import ModelsPage from "./pages/ModelsPage.tsx";
 import DictionariesPage from "./pages/DictionariesPage.tsx";
 import AssignmentsPage from "./pages/AssignmentsPage.tsx";
@@ -43,6 +44,7 @@ import LogisticsPage from "./pages/LogisticsPage.tsx";
 import ForecastModelsPage from "./pages/ForecastModelsPage.tsx";
 import ForecastPage from "./pages/ForecastPage.tsx";
 import BSCModelsPage from "./pages/BSCModelsPage.tsx";
+import ProfilePage from "./pages/ProfilePage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -83,6 +85,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <AdminPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/superadmin"
+                element={
+                  <ProtectedRoute>
+                    <SuperAdminPage />
                   </ProtectedRoute>
                 }
               />
@@ -324,6 +334,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <AnalyticsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <ProfilePage />
                   </ProtectedRoute>
                 }
               />

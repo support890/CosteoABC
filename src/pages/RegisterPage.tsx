@@ -35,9 +35,14 @@ export default function RegisterPage() {
     e.preventDefault();
     setLoading(true);
 
+    const trialEndsAt = new Date(
+      Date.now() + 14 * 24 * 60 * 60 * 1000,
+    ).toISOString();
+
     const { error } = await signUp(email, password, {
       full_name: name,
       company,
+      trial_ends_at: trialEndsAt,
     });
     setLoading(false);
 
@@ -197,9 +202,9 @@ export default function RegisterPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="starter">
-                        Starter — $49 USD/mes
+                        Starter — $89 USD/mes
                       </SelectItem>
-                      <SelectItem value="pro">Pro — $199 USD/mes</SelectItem>
+                      <SelectItem value="pro">Pro — $159 USD/mes</SelectItem>
                       <SelectItem value="enterprise">
                         Enterprise — Contactar ventas
                       </SelectItem>

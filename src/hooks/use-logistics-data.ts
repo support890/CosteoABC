@@ -40,7 +40,10 @@ export function useLogisticsModels() {
       if (error) throw error;
       return data as Model;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["models", tenantId, LOGISTICS_MODULE] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["models", tenantId, LOGISTICS_MODULE] });
+      qc.invalidateQueries({ queryKey: ["plan-limits-models", tenantId] });
+    },
   });
 
   const update = useMutation({

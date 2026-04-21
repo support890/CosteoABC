@@ -14,9 +14,6 @@ import {
   Box,
   FlaskConical,
   FileSpreadsheet,
-  Moon,
-  Sun,
-  LogOut,
   Database,
   ArrowLeft,
   TrendingUp,
@@ -30,7 +27,6 @@ import {
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
 import { useModelContext } from "@/contexts/ModelContext";
 import { useBIExpressContext } from "@/contexts/BIExpressContext";
 import { TEMPLATE_CATALOG } from "@/lib/bi-express-engine";
@@ -38,6 +34,7 @@ import { useLogisticsContext } from "@/contexts/LogisticsContext";
 import { useForecastContext } from "@/contexts/ForecastContext";
 import { useBSCContext } from "@/contexts/BSCContext";
 import { useTenant } from "@/hooks/use-tenant";
+import { useSuperAdmin } from "@/hooks/use-superadmin";
 import {
   Sidebar,
   SidebarContent,
@@ -48,11 +45,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
-  SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useTheme } from "@/hooks/use-theme";
-import { Button } from "@/components/ui/button";
 import { getCurrencySymbol } from "@/hooks/use-currency";
 
 const mainNav = [
@@ -103,9 +97,8 @@ function NavSection({
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
-  const { theme, toggleTheme } = useTheme();
-  const { signOut, user } = useAuth();
-  const { tenant, userRole } = useTenant();
+  const { userRole } = useTenant();
+  const { isSuperAdmin } = useSuperAdmin();
   const { selectedModel, selectedPeriod, setSelectedModel, setSelectedPeriod } =
     useModelContext();
   const { selectedBIModel, selectedBIPeriod, setSelectedBIModel, setSelectedBIPeriod, loadedTemplates } =
@@ -124,11 +117,6 @@ export function AppSidebar() {
   const isInForecast = !!(selectedForecastModel && selectedForecastPeriod);
   const isInBSC = !!(selectedBSCModel && selectedBSCPeriod);
   const isInModule = isInABC || isInBI || isInLogistics || isInForecast || isInBSC;
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate("/");
-  };
 
   const handleBackToModels = () => {
     setSelectedModel(null);
@@ -271,7 +259,12 @@ export function AppSidebar() {
 
       <SidebarContent>
         {!isInModule && (
-          <NavSection label="General" items={userRole === "admin" ? adminNav : mainNav} collapsed={collapsed} />
+          <>
+            <NavSection label="General" items={userRole === "admin" ? adminNav : mainNav} collapsed={collapsed} />
+            {isSuperAdmin && (
+              <NavSection label="Superadmin" items={[{ title: "Clientes", url: "/superadmin", icon: ShieldCheck }]} collapsed={collapsed} />
+            )}
+          </>
         )}
         <NavSection
           label={
@@ -290,35 +283,6 @@ export function AppSidebar() {
         )}
       </SidebarContent>
 
-      <SidebarFooter className="p-2 space-y-1">
-        {!collapsed && user && (
-          <p className="px-2 text-[11px] text-muted-foreground truncate text-center">
-            {user.email}
-          </p>
-        )}
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleTheme}
-            className="flex-1 flex items-center justify-center"
-          >
-            {theme === "dark" ? (
-              <Sun className="h-4 w-4" />
-            ) : (
-              <Moon className="h-4 w-4" />
-            )}
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleSignOut}
-            className="flex-1 flex items-center justify-center text-muted-foreground hover:text-destructive"
-          >
-            <LogOut className="h-4 w-4" />
-          </Button>
-        </div>
-      </SidebarFooter>
     </Sidebar>
   );
 }

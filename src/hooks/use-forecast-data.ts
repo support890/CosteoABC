@@ -40,7 +40,10 @@ export function useForecastModels() {
       if (error) throw error;
       return data as Model;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["models", tenantId, FORECAST_MODULE] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["models", tenantId, FORECAST_MODULE] });
+      qc.invalidateQueries({ queryKey: ["plan-limits-models", tenantId] });
+    },
   });
 
   const update = useMutation({

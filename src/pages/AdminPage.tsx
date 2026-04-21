@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Navigate } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { PageHeader } from "@/components/PageHeader";
@@ -16,6 +17,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -25,6 +36,10 @@ import {
 import { Users, Building2, Shield, Trash2, Pencil } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTenant } from "@/hooks/use-tenant";
+import { useAuth } from "@/contexts/AuthContext";
+import { usePlanLimits } from "@/hooks/use-plan-limits";
+import { useTrial } from "@/hooks/use-trial";
+import { UsageDialog } from "@/components/UsageDialog";
 import { supabase } from "@/lib/supabase";
 
 interface TenantMember {
@@ -41,15 +56,23 @@ interface TenantMember {
 }
 
 const roleLabels: Record<string, string> = {
-  admin: "Administrador",
-  analyst: "Analista",
-  kpi_owner: "Responsable KPI",
-  consultant: "Consultor",
+  admin: "Admin",
+  member: "Usuario invitado",
+  // legacy — keep labels for existing rows
+  analyst: "Usuario invitado",
+  kpi_owner: "Usuario invitado",
+  consultant: "Usuario invitado",
 };
 
 const AdminPage = () => {
   const { toast } = useToast();
   const { tenant, userRole } = useTenant();
+  const { user: currentUser } = useAuth();
+  const { canCreateUser } = usePlanLimits();
+  const { trialEndsAt } = useTrial();
+  const qc = useQueryClient();
+  const [limitDialogOpen, setLimitDialogOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState<{ id: string; name: string } | null>(null);
   const [members, setMembers] = useState<TenantMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -99,7 +122,11 @@ const AdminPage = () => {
         email: newEmail,
         password: newPassword,
         options: {
-          data: { full_name: newName },
+          data: {
+            full_name: newName,
+            is_invited: true,
+            ...(trialEndsAt ? { trial_ends_at: trialEndsAt.toISOString() } : {}),
+          },
         },
       });
 
@@ -157,6 +184,7 @@ const AdminPage = () => {
       setNewPassword("");
       setNewRole("analyst");
       fetchMembers();
+      qc.invalidateQueries({ queryKey: ["plan-limits-users", tenant?.id] });
     } catch (err) {
       console.error(err);
       toast({
@@ -232,6 +260,7 @@ const AdminPage = () => {
         description: `${memberName} fue removido del tenant`,
       });
       fetchMembers();
+      qc.invalidateQueries({ queryKey: ["plan-limits-users", tenant?.id] });
     }
   }
 
@@ -246,9 +275,12 @@ const AdminPage = () => {
         description="Gestión de usuarios y roles del tenant"
       >
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>Nuevo Usuario</Button>
-          </DialogTrigger>
+          <Button onClick={() => {
+            if (!canCreateUser) { setLimitDialogOpen(true); return; }
+            setDialogOpen(true);
+          }}>
+            Nuevo Usuario
+          </Button>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Crear Nuevo Usuario</DialogTitle>
@@ -288,17 +320,10 @@ const AdminPage = () => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="role">Rol</Label>
-                <Select value={newRole} onValueChange={setNewRole}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="admin">Administrador</SelectItem>
-                    <SelectItem value="analyst">Analista</SelectItem>
-                    <SelectItem value="kpi_owner">Responsable KPI</SelectItem>
-                    <SelectItem value="consultant">Consultor</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Input value="Usuario invitado" disabled />
+                <p className="text-xs text-muted-foreground">
+                  Los usuarios invitados no tienen permisos de administración.
+                </p>
               </div>
             </div>
             <DialogFooter>
@@ -342,10 +367,8 @@ const AdminPage = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="admin">Administrador</SelectItem>
-                  <SelectItem value="analyst">Analista</SelectItem>
-                  <SelectItem value="kpi_owner">Responsable KPI</SelectItem>
-                  <SelectItem value="consultant">Consultor</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="analyst">Usuario invitado</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -428,18 +451,20 @@ const AdminPage = () => {
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() =>
-                            handleDeleteMember(
-                              m.id,
-                              m.profiles?.full_name || "Usuario",
-                            )
-                          }
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
+                        {m.user_id !== currentUser?.id && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() =>
+                              setConfirmDelete({
+                                id: m.id,
+                                name: m.profiles?.full_name || "Usuario",
+                              })
+                            }
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -449,6 +474,32 @@ const AdminPage = () => {
           )}
         </CardContent>
       </Card>
+      <AlertDialog open={!!confirmDelete} onOpenChange={(o) => { if (!o) setConfirmDelete(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar usuario?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Vas a eliminar a <span className="font-semibold text-foreground">{confirmDelete?.name}</span> del equipo. Esta acción cerrará su sesión inmediatamente y no podrá acceder hasta que sea invitado nuevamente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive hover:bg-destructive/90"
+              onClick={() => {
+                if (confirmDelete) {
+                  handleDeleteMember(confirmDelete.id, confirmDelete.name);
+                  setConfirmDelete(null);
+                }
+              }}
+            >
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <UsageDialog open={limitDialogOpen} onOpenChange={setLimitDialogOpen} showUpgrade />
     </AppLayout>
   );
 };

@@ -324,7 +324,10 @@ export function useModels() {
       if (error) throw error;
       return data as Model;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["models", tenantId, "abc"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["models", tenantId, "abc"] });
+      qc.invalidateQueries({ queryKey: ["plan-limits-models", tenantId] });
+    },
   });
 
   const update = useMutation({
